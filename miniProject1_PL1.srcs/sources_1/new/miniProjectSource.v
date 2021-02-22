@@ -30,6 +30,9 @@
 // 1. Are functions a thing in verilog, are classes?
 // 2. Can I make this in C instead of verilog, I dont like verilog.
 // 3. TODO: Dont let corbin touch the code
+// 4. Figure out how to get rid of the critical warnings in the Synthesis and Implementation, it seems
+// to be related to the amount of set_properties being used, "set_property expects at least one object"
+
 //Period 60Hz
 module miniProjectSource(
     input clock,
