@@ -26,7 +26,10 @@
 // Switch 7 : Right motor on
 // 7 seg display: 
 //////////////////////////////////////////////////////////////////////////////////
-
+//GENERAL THINGS I WISH TO KNOW
+// 1. Are functions a thing in verilog, are classes?
+// 2. Can I make this in C instead of verilog, I dont like verilog.
+// 3. TODO: Dont let corbin touch the code
 //Period 60Hz
 module miniProjectSource(
     input clock,
@@ -75,25 +78,23 @@ module miniProjectSource(
             counter <= 0;
         else if (safety == 0)
             counter <= counter +1;
-        
-        /*if(safety == 0)
-            temp_PWM <= 0;
-        else if(counter < width)
-            temp_PWM <= 1;
-        else
-            temp_PWM <= 0;*/ 
-        
             
         if(counter < width)
            temp_PWM <= 1;
         else 
            temp_PWM <= 0;   
               
+              //This same code is above, is it needed?
         if (count > 1666666)
             count <= 0;
         else
             count <= count + 1;
             
+            
+            /*Several Things with this code
+            1. what is safety count to begin with, what is it initialized at?
+            2. Logic seems iffy, corbin needs to explain 
+            */ 
         if (control1 || control2) begin
         if(safety_count > 7000000)begin
             safety=1;
@@ -119,7 +120,7 @@ module miniProjectSource(
     reg [3:0] an_temp;
 always @ (*)
 begin
- 
+ //TODO: Move multiplexing to somewhere else, its ugly
   case(count[N-1:N-2]) //using only the 2 MSB's of the counter 
    2'b00 :  //When the 2 MSB's are 00 enable the fourth display
     begin
@@ -226,21 +227,10 @@ assign {s6, s5, s4, s3, s2, s1, s0} = sseg_temp;
         f = temp2;
         end
         
-    //if (safety == 0) 
         
     end
    
 assign PWM = temp_PWM;
 
-/*
-always@(*)begin
-    
-    if(safety == 0)begin
-        e = temp2;
-        f = temp2;
-        #1000000000;
-        safety = 1;
-        end
-    end
-*/
+
 endmodule
