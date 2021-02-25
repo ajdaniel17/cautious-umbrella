@@ -35,6 +35,8 @@
 
 //Period 60Hz
 module miniProjectSource(
+    //TODO: Review all variables, are all of them neccesary?
+    //TODO: Add more coments so I can remember what any of this does
     input clock,
     input in0,in1,in2,in3,in4,in5,in6,in7,
     input btnC,
@@ -47,7 +49,7 @@ module miniProjectSource(
     
     localparam N = 18;
     
-    
+    //TODO: Review all regs used, are all of them neccesary?
     reg temp = 1;
     reg temp2 = 0;
     
@@ -65,13 +67,16 @@ module miniProjectSource(
     
     initial begin
     safety = 0;
+    safety_count = 0;
     counter = 0;
     width = 0;
     temp_PWM = 0;
     //safety_count = 0;
     end
     
-    
+    reg [N-1:0] count;
+    reg [6:0] sseg_temp;    
+    reg [3:0] an_temp;
     
     
     
@@ -87,40 +92,27 @@ module miniProjectSource(
         else 
            temp_PWM <= 0;   
               
-              //This same code is above, is it needed?
-        if (count > 1666666)
-            count <= 0;
-        else
-            count <= count + 1;
             
-            
-            /*Several Things with this code
-            1. what is safety count to begin with, what is it initialized at?
-            2. Logic seems iffy, corbin needs to explain 
-            */ 
+        //If Current is over 1Amp for over .07 seconds, change the safety state
         if (control1 || control2) begin
-        if(safety_count > 7000000)begin
-            safety=1;
+        //Counts to make sure motors are pulling more than 1 Amp for .07 seconds
+         if(safety_count > 7000000)
+            safety=1; 
+         else 
+            safety_count <= safety_count +1;     
         end
-        else begin
-            safety_count <= safety_count +1;
-        end
-        end
-    
+          
         else begin 
             safety_count = 0;
-            safety = safety;
-        if(btnC) begin
-            safety = 0;
-        end
+            //reset safety state
+            if(btnC) 
+                safety = 0;
         end
         
             
     end
     
-    reg [N-1:0] count;
-    reg [6:0] sseg_temp;    
-    reg [3:0] an_temp;
+
 always @ (*)
 begin
  //TODO: Move multiplexing to somewhere else, its ugly
@@ -163,6 +155,7 @@ begin
  end
 assign an = an_temp;
 
+//Do we really need multiple always @ (*) , I think we can just put it all under one
 always @ (*)
  begin
   case(sseg)
