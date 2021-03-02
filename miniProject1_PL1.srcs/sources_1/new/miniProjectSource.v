@@ -44,6 +44,7 @@ module miniProjectSource(
     input wire control1,control2,
     output reg a,b,c,d,e,f,
     output s0,s1,s2,s3,s4,s5,s6,dp,
+    output LED,
     output [3:0] an
     );
     
@@ -64,6 +65,7 @@ module miniProjectSource(
     integer speed;
     reg [7:0]sseg;
     integer safety;
+    integer D1,D2,D3,D4;
     
     initial begin
     safety = 0;
@@ -71,12 +73,13 @@ module miniProjectSource(
     counter = 0;
     width = 0;
     temp_PWM = 0;
-    //safety_count = 0;
+    D1 = 0;
+    D2 = 1;
+    D3 = 2;
+    D4 = 3;
     end
     
-    reg [N-1:0] count;
-    reg [6:0] sseg_temp;    
-    reg [3:0] an_temp;
+
     
     
     
@@ -87,10 +90,6 @@ module miniProjectSource(
         else if (safety == 0)
             counter <= counter +1;
             
-        if (count > 1666666)
-            count <= 0;
-        else 
-            count <= count + 1 ;
         
         if(counter < width)
            temp_PWM <= 1;
@@ -117,9 +116,6 @@ module miniProjectSource(
         
             
     end
-    SevenSegmentDisplay DisplayThings (
-        
-        );
 
     // 100% duty cycle is 1666666.67
     //  75% duty cycle is 1250000
@@ -172,6 +168,21 @@ module miniProjectSource(
     end
    
 assign PWM = temp_PWM;
-
-
+SevenSegmentDisplay SevenDisplay(
+.clock(clock),
+.reset(),
+.a(s0),
+.b(s1),
+.c(s2),
+.d(s3),
+.e(s4),
+.f(s5),
+.g(s6),
+.dp(dp),
+.in0(D1),
+.in1(D2),
+.in2(D3),
+.in3(D4),
+.an(an)
+);
 endmodule
