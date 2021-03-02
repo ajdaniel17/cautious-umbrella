@@ -43,11 +43,7 @@ begin
   case(count[N-1:N-2]) //using only the 2 MSB's of the counter 
     2'b00 :  //When the 2 MSB's are 00 enable the fourth display
     begin
-        sseg = d1;
-
-
-
- //Display item      
+        sseg = d1;  //Display item      
         an_temp = 4'b1110;
     end
    
