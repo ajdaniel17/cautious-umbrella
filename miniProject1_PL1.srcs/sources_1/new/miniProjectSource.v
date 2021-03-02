@@ -87,11 +87,17 @@ module miniProjectSource(
         else if (safety == 0)
             counter <= counter +1;
             
+        if (count > 1666666)
+            count <= 0;
+        else 
+            count <= count + 1 ;
+        
         if(counter < width)
            temp_PWM <= 1;
         else 
            temp_PWM <= 0;   
               
+
             
         //If Current is over 1Amp for over .07 seconds, change the safety state
         if (control1 || control2) begin
@@ -111,70 +117,9 @@ module miniProjectSource(
         
             
     end
-    
-
-always @ (*)
-begin
- //TODO: Move multiplexing to somewhere else, its ugly
-  case(count[N-1:N-2]) //using only the 2 MSB's of the counter 
-   2'b00 :  //When the 2 MSB's are 00 enable the fourth display
-    begin
-        if (safety == 1) begin
-            sseg = 10;
-            end
-        else begin
-            sseg = 5;
-            //safety = 1;
-            end         
-     an_temp = 4'b1110;
-    end
-   
-   2'b01:  //When the 2 MSB's are 01 enable the third display
-    begin
-        if (safety == 1) begin
-            sseg = 1;
-            end
-        else begin
-            sseg = 5;           
-            end
-     an_temp = 4'b1101;
-    end
-   
-   2'b10:  //When the 2 MSB's are 10 enable the second display
-    begin
-     sseg = 0;
-     an_temp = 4'b1011;
-    end
-    
-   2'b11:  //When the 2 MSB's are 11 enable the first display
-    begin
-      sseg = 0;    
-     an_temp = 4'b0111;
-    end
-  endcase
- end
-assign an = an_temp;
-
-//Do we really need multiple always @ (*) , I think we can just put it all under one
-always @ (*)
- begin
-  case(sseg)
-   4'd0 : sseg_temp = 7'b1000000; //to display 0
-   4'd1 : sseg_temp = 7'b1111001; //to display 1
-   4'd2 : sseg_temp = 7'b0100100; //to display 2
-   4'd3 : sseg_temp = 7'b0110000; //to display 3
-   4'd4 : sseg_temp = 7'b0011001; //to display 4
-   4'd5 : sseg_temp = 7'b0010010; //to display 5
-   4'd6 : sseg_temp = 7'b0000010; //to display 6
-   4'd7 : sseg_temp = 7'b1111000; //to display 7
-   4'd8 : sseg_temp = 7'b0000000; //to display 8
-   4'd9 : sseg_temp = 7'b0010000; //to display 9
-   4'd10 : sseg_temp = 7'b0001000; //to display A
-   default : sseg_temp = 7'b1111111; //dash
-  endcase
- end
-assign {s6, s5, s4, s3, s2, s1, s0} = sseg_temp;
-
+    SevenSegmentDisplay DisplayThings (
+        
+        );
 
     // 100% duty cycle is 1666666.67
     //  75% duty cycle is 1250000
