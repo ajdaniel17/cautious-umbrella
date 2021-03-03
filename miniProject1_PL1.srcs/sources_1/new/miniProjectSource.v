@@ -61,7 +61,7 @@ module miniProjectSource(
     reg [21:0] width;
     reg [27:0] safety_count;
     reg temp_PWM;
-    reg temp_curr;
+    reg temptest;
     integer speed;
     reg [7:0]sseg;
     integer safety;
@@ -77,14 +77,19 @@ module miniProjectSource(
     D2 = 1;
     D3 = 2;
     D4 = 3;
+    $display("Desperation");
     end
     
 
     
     
-    
+    //baudrate of color sensor 9600
     always@(posedge clock) begin
+    
+    if(in0)
+        $display("Switch ON");
         
+      
         if (counter > 1666666)
             counter <= 0;
         else if (safety == 0)
@@ -133,41 +138,46 @@ module miniProjectSource(
     default : width = 0;    
     endcase
     
-    if(in4) begin
-        a = temp;
-        b = temp2;
-        end
-    else begin
-        a = temp2;
-        b = temp;
-        end
-    if(in5) begin
-        c = temp;
-        d = temp2;
-        end
-    else begin
-        c = temp2;
-        d = temp;
-        end  
+    
+    temptest = in0;
+    
+//    if(in4) begin
+//        a = temp;
+//        b = temp2;
+//        end
+//    else begin
+//        a = temp2;
+//        b = temp;
+//        end
+//    if(in5) begin
+//        c = temp;
+//        d = temp2;
+//        end
+//    else begin
+//        c = temp2;
+//        d = temp;
+//        end  
         
-    if (in6 && safety == 0) begin
-        e = temp_PWM;
-        end
-    else begin
-        e = temp2;
-        end
+//    if (in6 && safety == 0) begin
+//        e = temp_PWM;
+//        end
+//    else begin
+//        e = temp2;
+//        end
         
-    if (in7 && safety == 0) begin
-        f = temp_PWM;
-        end
-    else begin
-        f = temp2;
-        end
+//    if (in7 && safety == 0) begin
+//        f = temp_PWM;
+//        end
+//    else begin
+//        f = temp2;
+//        end
         
         
     end
    
 assign PWM = temp_PWM;
+assign LED = temptest;
+//D4,D3,D2,D1 are what get displayed, in that order 
 SevenSegmentDisplay SevenDisplay(
 .clock(clock),
 .reset(),
