@@ -42,9 +42,10 @@ module miniProjectSource(
     input btnC,
     output PWM,
     input wire control1,control2,
+    input testport,
     output reg a,b,c,d,e,f,
     output s0,s1,s2,s3,s4,s5,s6,dp,
-    output LED,
+    output LED0,LED1,
     output [3:0] an
     );
     
@@ -57,6 +58,11 @@ module miniProjectSource(
     //100000000/60 = 1666666.667
     //log    (1666666.67) = 20.6 round up to 21
     //   (2)
+    
+    
+    //100000000/9600 = 10416.667
+    //log (base 2) (10416.667) = 14 (rounded up)
+   
     reg [21:0] counter;
     reg [21:0] width;
     reg [27:0] safety_count;
@@ -66,8 +72,10 @@ module miniProjectSource(
     reg [7:0]sseg;
     integer safety;
     integer D1,D2,D3,D4;
+    integer i;
     
     initial begin
+    
     safety = 0;
     safety_count = 0;
     counter = 0;
@@ -77,17 +85,11 @@ module miniProjectSource(
     D2 = 1;
     D3 = 2;
     D4 = 3;
-    $display("Desperation");
     end
-    
-
     
     
     //baudrate of color sensor 9600
     always@(posedge clock) begin
-    
-    if(in0)
-        $display("Switch ON");
         
       
         if (counter > 1666666)
@@ -101,7 +103,6 @@ module miniProjectSource(
         else 
            temp_PWM <= 0;   
               
-
             
         //If Current is over 1Amp for over .07 seconds, change the safety state
         if (control1 || control2) begin
@@ -176,7 +177,8 @@ module miniProjectSource(
     end
    
 assign PWM = temp_PWM;
-assign LED = temptest;
+assign LED0 = testport;
+assign LED1 = ~testport;
 //D4,D3,D2,D1 are what get displayed, in that order 
 SevenSegmentDisplay SevenDisplay(
 .clock(clock),
