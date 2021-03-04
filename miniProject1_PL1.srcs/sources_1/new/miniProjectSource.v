@@ -45,7 +45,9 @@ module miniProjectSource(
     input testport,
     output reg a,b,c,d,e,f,
     output s0,s1,s2,s3,s4,s5,s6,dp,
-    output LED0,LED1,
+    output LED0,LED1,LED2,LED3,LED4,
+    input colorinput,
+    output colors2,colors3,
     output [3:0] an
     );
     
@@ -177,8 +179,19 @@ module miniProjectSource(
     end
    
 assign PWM = temp_PWM;
-assign LED0 = testport;
-assign LED1 = ~testport;
+
+ColorSensor sensecolor(
+    .clock(clock),
+    .colorinput(colorinput),
+    .s2(colors2),
+    .s3(colors3),
+    .LED0(LED0),
+    .LED1(LED1),
+    .LED2(LED2),
+    .LED3(LED3),
+    .LED4(LED4)
+    );
+    
 //D4,D3,D2,D1 are what get displayed, in that order 
 SevenSegmentDisplay SevenDisplay(
 .clock(clock),
