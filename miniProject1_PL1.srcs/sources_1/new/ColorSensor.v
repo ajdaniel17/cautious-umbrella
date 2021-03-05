@@ -24,7 +24,8 @@ module ColorSensor(
     input clock,
     input colorinput,
     output s2,s3,
-    output LED0,LED1,LED2,LED3,LED4
+    output LED0,LED1,LED2,LED3,LED4,
+    output JA4
     );
     
     localparam ticrate = 100;
@@ -33,12 +34,13 @@ module ColorSensor(
     integer i;
     reg [1:0] colorsetting;
     integer timeperiod;
-    integer frequency;
+    integer frq;
     reg temps2,temps3;
     integer red,blue,green;
-    reg freqON,freqOFF;
+    reg freqON,freqOFF,JA4reg;
     
     initial begin
+    JA4reg = 0;
     red = 0;
     blue = 0;
     green = 0;
@@ -46,7 +48,7 @@ module ColorSensor(
     colorsetting = 0;
     i = 0;
     timeperiod = 0;
-    frequency = 0;
+    frq = 0;
     redFRQ = 0;
     blueFRQ = 0;
     grnFRQ = 0;
@@ -56,18 +58,17 @@ module ColorSensor(
     
     always @ (posedge clock) 
     begin
-        if(frequency > 100) 
+        if(JA4)//frq > 100) 
         begin 
             timeperiod <= count;
             count <= 0;
             i = 1;
-            freqON = 1;
+           // freqON = 1;
         end
         else
             count <= count + 1;
             
-        if (frequency > 20)
-            freqON = 1;
+  
 
         
         if(i == 1)
@@ -79,7 +80,7 @@ module ColorSensor(
                 default : redFRQ = 100;
             endcase
             i = 0;
-            frequency = 0;
+            frq = 0;
             case(colorsetting)
                 2'd0:colorsetting = 2'd1;
                 2'd1:colorsetting = 2'd2;
@@ -88,17 +89,17 @@ module ColorSensor(
         end  
         
         
-        if(colorsetting == 0)
+        if(colorsetting == 0) //Red
         begin
             temps2 = 0;
             temps3 = 0;
         end
-        else if (colorsetting == 1)
+        else if (colorsetting == 1) //Blue
         begin 
             temps2 = 0;
             temps3 = 1;
         end
-        else if (colorsetting == 2)
+        else if (colorsetting == 2) //Green
         begin 
             temps2 = 1;
             temps3 = 1;
@@ -133,24 +134,23 @@ module ColorSensor(
     
     always @ (*)
     begin 
+
         if(colorinput)
         begin
-            frequency <= frequency +1;
-            freqOFF = 1;
+            frq = frq +1; //ISSUE ISSUE ISSUE, FRQ IS NOT CHANGING, WHy wH YWH YWY
+            freqOFF = 0;
+            JA4reg = 1;
         end
         else
         begin
-            freqOFF = 0;
+            JA4reg = 0;
+            freqOFF = 1;
         end
-        
-        
-        
-        
-        
-        
-        
+    
     end
     
+
+    assign JA4 = JA4reg;
     assign LED0 = red;
     assign LED1 = blue;
     assign LED2 = green;

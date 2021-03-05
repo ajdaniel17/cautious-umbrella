@@ -135,8 +135,8 @@ set_property PACKAGE_PIN J2 [get_ports {colors3}]
 set_property PACKAGE_PIN G2 [get_ports {testfrq}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {testfrq}]
 ###Sch name = JA7
-#set_property PACKAGE_PIN H1 [get_ports {JA[4]}]					
-#	set_property IOSTANDARD LVCMOS33 [get_ports {JA[4]}]
+set_property PACKAGE_PIN H1 [get_ports {JA4}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {JA4}]
 ###Sch name = JA8
 #set_property PACKAGE_PIN K2 [get_ports {JA[5]}]					
 #	set_property IOSTANDARD LVCMOS33 [get_ports {JA[5]}]

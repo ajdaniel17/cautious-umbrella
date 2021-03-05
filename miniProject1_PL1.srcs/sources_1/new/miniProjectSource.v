@@ -49,7 +49,8 @@ module miniProjectSource(
     input colorinput,
     output colors2,colors3,
     output [3:0] an,
-    output testfrq
+    output testfrq,
+    output JA4
     );
     
     localparam N = 18;
@@ -200,7 +201,8 @@ ColorSensor sensecolor(
     .LED1(LED1),
     .LED2(LED2),
     .LED3(LED3),
-    .LED4(LED4)
+    .LED4(LED4),
+    .JA4(JA4)
     );
     
 //D4,D3,D2,D1 are what get displayed, in that order 
