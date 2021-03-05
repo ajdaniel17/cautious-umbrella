@@ -65,6 +65,9 @@ module ColorSensor(
         end
         else
             count <= count + 1;
+            
+        if (frequency > 20)
+            freqON = 1;
 
         
         if(i == 1)
@@ -133,13 +136,13 @@ module ColorSensor(
         if(colorinput)
         begin
             frequency <= frequency +1;
-
-
+            freqOFF = 1;
         end
         else
         begin
-
+            freqOFF = 0;
         end
+        
         
         
         

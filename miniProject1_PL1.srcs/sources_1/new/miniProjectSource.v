@@ -48,7 +48,8 @@ module miniProjectSource(
     output LED0,LED1,LED2,LED3,LED4,
     input colorinput,
     output colors2,colors3,
-    output [3:0] an
+    output [3:0] an,
+    output testfrq
     );
     
     localparam N = 18;
@@ -66,6 +67,7 @@ module miniProjectSource(
     //log (base 2) (10416.667) = 14 (rounded up)
    
     reg [21:0] counter;
+    reg [21:0] counter2;
     reg [21:0] width;
     reg [27:0] safety_count;
     reg temp_PWM;
@@ -75,9 +77,10 @@ module miniProjectSource(
     integer safety;
     integer D1,D2,D3,D4;
     integer i;
+    reg testFRQ;
     
     initial begin
-    
+    testFRQ = 0;
     safety = 0;
     safety_count = 0;
     counter = 0;
@@ -93,7 +96,14 @@ module miniProjectSource(
     //baudrate of color sensor 9600
     always@(posedge clock) begin
         
-      
+        if (counter2 > 5000)
+        begin
+            counter2 <= 0;
+            testFRQ = ~testFRQ;
+        end
+        else
+            counter2 <= counter2 +1;
+                
         if (counter > 1666666)
             counter <= 0;
         else if (safety == 0)
@@ -177,7 +187,8 @@ module miniProjectSource(
         
         
     end
-   
+    
+assign testfrq = testFRQ;
 assign PWM = temp_PWM;
 
 ColorSensor sensecolor(
