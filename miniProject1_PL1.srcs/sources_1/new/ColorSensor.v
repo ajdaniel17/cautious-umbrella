@@ -56,7 +56,7 @@ module ColorSensor(
     
     always @ (posedge clock) 
     begin
-        if(frequency > ticrate) 
+        if(frequency > 100) 
         begin 
             timeperiod <= count;
             count <= 0;
@@ -132,7 +132,7 @@ module ColorSensor(
     begin 
         if(colorinput)
         begin
-            frequency = frequency +1;
+            frequency <= frequency +1;
 
 
         end
