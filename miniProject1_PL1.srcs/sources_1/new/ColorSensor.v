@@ -29,11 +29,11 @@ module ColorSensor(
     
     localparam ticrate = 100;
     integer redFRQ,blueFRQ,grnFRQ;
-    reg [15:0] count;
+    integer count;
     integer i;
     reg [1:0] colorsetting;
     integer timeperiod;
-    reg[7:0] frequency;
+    integer frequency;
     reg temps2,temps3;
     integer red,blue,green;
     reg freqON,freqOFF;
@@ -50,15 +50,18 @@ module ColorSensor(
     redFRQ = 0;
     blueFRQ = 0;
     grnFRQ = 0;
+    freqON = 0;
+    freqOFF = 0;
     end
     
     always @ (posedge clock) 
     begin
-        if(frequency >= ticrate) 
+        if(frequency > ticrate) 
         begin 
             timeperiod <= count;
             count <= 0;
             i = 1;
+            freqON = 1;
         end
         else
             count <= count + 1;
@@ -130,13 +133,12 @@ module ColorSensor(
         if(colorinput)
         begin
             frequency = frequency +1;
-            freqON = 1;
-            freqOFF = 0;
+
+
         end
         else
         begin
-            freqOFF = 1;
-            freqON = 0;
+
         end
         
         
