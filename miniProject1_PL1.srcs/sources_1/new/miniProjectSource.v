@@ -29,7 +29,7 @@
 //GENERAL THINGS I WISH TO KNOW
 // 1. Are functions a thing in verilog, are classes?
 // 2. Can I make this in C instead of verilog, I dont like verilog.
-// 3. TODO: Dont let corbin touch the code
+// 3. TODO:  let corbin touch the code
 // 4. Figure out how to get rid of the critical warnings in the Synthesis and Implementation, it seems
 // to be related to the amount of set_properties being used, "set_property expects at least one object"
 
@@ -202,7 +202,8 @@ ColorSensor sensecolor(
     .LED2(LED2),
     .LED3(LED3),
     .LED4(LED4),
-    .JA4(JA4)
+    .frqdone(),
+    .FRQ()
     );
     
 //D4,D3,D2,D1 are what get displayed, in that order 

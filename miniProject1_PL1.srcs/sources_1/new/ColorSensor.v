@@ -22,140 +22,132 @@
 
 module ColorSensor(
     input clock,
-    input colorinput,
+    input colorinput,frqdone,
     output s2,s3,
     output LED0,LED1,LED2,LED3,LED4,
-    output JA4
+    input[19:0] FRQ
     );
     
-    localparam ticrate = 100;
-    integer redFRQ,blueFRQ,grnFRQ;
-    integer count;
-    integer i;
-    reg [1:0] colorsetting;
-    integer timeperiod;
-    integer frq;
-    reg temps2,temps3;
-    integer red,blue,green;
-    reg freqON,freqOFF,JA4reg;
+    reg enable = 1;
+    reg temps2 = 1;
+    reg temps3 = 0;
+    reg [19:0] TEMPFRQ;
+    reg [1:0] colorsetting = 2'd0;
+    reg [19:0] TEMPRED,TEMPBLUE,TEMPGREEN,TEMPWHITE;
+    reg done = 1;
+    reg TLED0 = 0,TLED1 = 0,TLED2 = 0,TLED3 = 0;
+    reg[16:0] count; 
+    reg done1=0,done2=0;
     
-    initial begin
-    JA4reg = 0;
-    red = 0;
-    blue = 0;
-    green = 0;
-    count = 0;
-    colorsetting = 0;
-    i = 0;
-    timeperiod = 0;
-    frq = 0;
-    redFRQ = 0;
-    blueFRQ = 0;
-    grnFRQ = 0;
-    freqON = 0;
-    freqOFF = 0;
-    end
-    
-    always @ (posedge clock) 
-    begin
-        if(JA4)//frq > 100) 
-        begin 
-            timeperiod <= count;
+ReadFrequency Readthis(
+     .CLK(clock),        
+     .enable(enable),       
+     .IN(colorinput),         
+     .freq(FRQ),
+     .done(frqdone) 
+     );
+     
+     always @(posedge clock)
+     begin
+        if(frqdone)
+        begin
+            TEMPFRQ = FRQ;
+            enable = 0;
+            done1 =1;    
+        end
+        
+        if (count > 1000)
+        begin
+            done2 = 1;
             count <= 0;
-            i = 1;
-           // freqON = 1;
+            done1 = 0;
         end
-        else
-            count <= count + 1;
+        else if (done1)
+            count <= count +1;
             
-  
+        if(done2 & done)
+        begin
+         
 
+                 //initial value at white   
+                 case(colorsetting)
+                 2'd0 : begin //white to red
+                 TEMPWHITE = TEMPFRQ;
+                 temps2 = 0;
+                 temps3 = 0;
+                 colorsetting = 2'd1;
+                 enable = 1;
+                 end
+                 2'd1 : begin //red to green
+                 TEMPRED = TEMPFRQ;
+                 temps2 = 1;
+                 temps3 = 1;
+                 colorsetting = 2'd2;
+                 enable = 1;
+                 end
+                 2'd2 : begin //green to blue
+                 TEMPGREEN = TEMPFRQ;
+                 temps2 = 0;
+                 temps3 = 1;
+                 colorsetting = 2'd3;
+                 enable = 1;
+                 end
+                 2'd3 : begin //blue to white
+                 TEMPBLUE = TEMPFRQ;
+                 temps2 = 1;
+                 temps3 = 0;
+                 colorsetting = 2'd0;
+                 done = 0;
+                 end
+                 default: colorsetting = 2'd0;
+                 endcase
+                 
+                 
+                 done2 = 0;
+        end    
         
-        if(i == 1)
+        if(~done)
         begin
-            case(colorsetting)
-                2'd0:redFRQ  = timeperiod;
-                2'd1:blueFRQ = timeperiod;
-                2'd2:grnFRQ  = timeperiod;
-                default : redFRQ = 100;
-            endcase
-            i = 0;
-            frq = 0;
-            case(colorsetting)
-                2'd0:colorsetting = 2'd1;
-                2'd1:colorsetting = 2'd2;
-                2'd2:colorsetting = 2'd0;
-            endcase
-        end  
+        enable = 0;
         
+            if(TEMPRED > TEMPBLUE & TEMPRED > TEMPGREEN)
+            begin
+            TLED0 = 1;
+            TLED1 = 0;
+            TLED2 = 0;
+            TLED3 = 0;
+            end
+            else if (TEMPGREEN > TEMPRED & TEMPGREEN > TEMPBLUE)
+            begin
+            TLED0 = 0;
+            TLED1 = 1;
+            TLED2 = 0;
+            TLED3 = 0;
+            end
+            else if (TEMPBLUE > TEMPRED & TEMPBLUE > TEMPGREEN)
+            begin
+            TLED0 = 0;
+            TLED1 = 0;
+            TLED2 = 1;
+            TLED3 = 0;
+            end
+            else
+            begin
+            TLED0 = 0;
+            TLED1 = 0;
+            TLED2 = 0;
+            TLED3 = 1;
+            end
+                
         
-        if(colorsetting == 0) //Red
-        begin
-            temps2 = 0;
-            temps3 = 0;
+        done = 1;
+        enable = 1;
         end
-        else if (colorsetting == 1) //Blue
-        begin 
-            temps2 = 0;
-            temps3 = 1;
-        end
-        else if (colorsetting == 2) //Green
-        begin 
-            temps2 = 1;
-            temps3 = 1;
-        end
-        
-        
-        if(redFRQ > blueFRQ && redFRQ > grnFRQ)
-        begin 
-        red = 1;
-        blue = 0;
-        green = 0;
-        end
-        else if (blueFRQ > redFRQ && blueFRQ > grnFRQ)
-        begin
-        red = 0;
-        blue = 1;
-        green = 0;
-        end  
-        else if (grnFRQ > redFRQ && grnFRQ > blueFRQ)
-        begin 
-        red = 0;
-        blue = 0;
-        green = 1;
-        end
-        else
-        begin
-        red = 1;
-        blue = 1;
-        green = 1;
-        end
-    end
-    
-    always @ (*)
-    begin 
-
-        if(colorinput)
-        begin
-            frq = frq +1; //ISSUE ISSUE ISSUE, FRQ IS NOT CHANGING, WHy wH YWH YWY
-            freqOFF = 0;
-            JA4reg = 1;
-        end
-        else
-        begin
-            JA4reg = 0;
-            freqOFF = 1;
-        end
-    
-    end
-    
-
-    assign JA4 = JA4reg;
-    assign LED0 = red;
-    assign LED1 = blue;
-    assign LED2 = green;
-    assign LED3 = freqON;
-    assign LED4 = freqOFF;
-    assign s2 = temps2;
-    assign s3 = temps3;
+     end
+assign LED0 = TLED0;
+assign LED1 = TLED1;
+assign LED2 = TLED2;
+assign LED3 = TLED3;
+assign s2 = temps2;
+assign s3 = temps3;
 endmodule
