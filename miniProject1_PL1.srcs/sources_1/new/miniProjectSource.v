@@ -50,7 +50,7 @@ module miniProjectSource(
     output colors2,colors3,
     output [3:0] an,
     output testfrq,
-    output JA4
+    output JA4,JA5,JA6
     );
     
     localparam N = 18;
@@ -203,7 +203,10 @@ ColorSensor sensecolor(
     .LED3(LED3),
     .LED4(LED4),
     .frqdone(),
-    .FRQ()
+    .FRQ(),
+    .JA4(JA4),
+    .JA5(JA5),
+    .JA6(JA6)
     );
     
 //D4,D3,D2,D1 are what get displayed, in that order 
@@ -224,4 +227,5 @@ SevenSegmentDisplay SevenDisplay(
 .in3(D4),
 .an(an)
 );
+
 endmodule
