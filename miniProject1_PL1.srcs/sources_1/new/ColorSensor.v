@@ -32,7 +32,8 @@ module ColorSensor(
     
     reg FRQenable = 1;
     reg DIVenable = 0;
-    reg tempCorbo = 0;
+    reg tempCorbo0 = 0;
+    reg tempCorbo1 = 0;
     reg tempCorbo2 = 0;
     reg temps2 = 1;
     reg temps3 = 0;
@@ -43,7 +44,11 @@ module ColorSensor(
     reg done = 1;
     reg TLED0 = 0,TLED1 = 0,TLED2 = 0,TLED3 = 0;
     reg[16:0] count; 
+    reg[16:0] count2;
     reg done1=0,done2=0,done3=0,done4=0;
+    reg [6:0] redThresh = 7'd55;
+    reg [6:0] blueThresh = 7'd30;
+    reg [6:0] greenThresh = 7'd20;
     
 ReadFrequency Readthis(
      .CLK(clock),        
@@ -69,7 +74,12 @@ IntegerDivision DivideByClear(
     begin
         if(colorsetting == 2'd0)
         begin
+            //tempCorbo2 = 1;
+            //if (FRQ == 0)
+                //tempCorbo2 = 1;
             TEMPFRQ = FRQ;
+            if (TEMPFRQ == 0)
+                tempCorbo0 = 1;
             FRQenable = 0;
             done1 =1;    
         end
@@ -77,14 +87,21 @@ IntegerDivision DivideByClear(
             begin
                 TEMPFRQ2 = FRQ;
                 FRQenable = 0;
-                done3 = 1;
+                if (TEMPWHITE == 0)
+                    tempCorbo1 = 1;
+                else
+                    tempCorbo2 = 1;
+ 
+                    //tempCorbo0 = 1;
+                    done3 = 1;
                // DIVenable = 1;
             end
         
      end
         if(divdone)
             begin 
-                tempCorbo = 1;
+                //if (tempquo == 0)
+                    //tempCorbo2 = 1;
                 TEMPFRQ = tempquo;
                 DIVenable = 0;
                 done1 = 1;
@@ -94,14 +111,14 @@ IntegerDivision DivideByClear(
     
     
     //Need a buffer, not sure why
-    if (count > 2)
+    if (count2 > 2)
     begin
         done4 = 1;
-        count <= 0;
+        count2 <= 0;
         done3 = 0;
     end
     else if (done3)
-        count <= count +1;
+        count2 <= count2 +1;
         
         
     //Need a buffer, not sure why
@@ -121,6 +138,8 @@ IntegerDivision DivideByClear(
              //initial value at white   
              case(colorsetting)
              2'd0 : begin //white to red
+             //if (TEMPFRQ == 0)
+                //tempCorbo2 = 1;
              TEMPWHITE = TEMPFRQ;
              temps2 = 0;
              temps3 = 0;
@@ -128,6 +147,7 @@ IntegerDivision DivideByClear(
              FRQenable = 1;
              end
              2'd1 : begin //red to green
+             //tempCorbo0 = 1;
              TEMPRED = TEMPFRQ;
              temps2 = 1;
              temps3 = 1;
@@ -135,6 +155,7 @@ IntegerDivision DivideByClear(
              FRQenable = 1;
              end
              2'd2 : begin //green to blue
+             //tempCorbo0 = 1;
              TEMPGREEN = TEMPFRQ;
              temps2 = 0;
              temps3 = 1;
@@ -164,33 +185,38 @@ IntegerDivision DivideByClear(
     if(~done)
     begin
     FRQenable = 0;
-        if(TEMPRED > TEMPBLUE & TEMPRED > TEMPGREEN)
+        if(TEMPRED > redThresh)
         begin
-        tempCorbo2 = 1;
         TLED0 = 1;
-        TLED1 = 0;
-        TLED2 = 0;
-        TLED3 = 0;
-        end
-        else if (TEMPGREEN > TEMPRED & TEMPGREEN > TEMPBLUE)
-        begin
-        TLED0 = 0;
-        TLED1 = 1;
-        TLED2 = 0;
-        TLED3 = 0;
-        end
-        else if (TEMPBLUE > TEMPRED & TEMPBLUE > TEMPGREEN)
-        begin
-        TLED0 = 0;
-        TLED1 = 0;
-        TLED2 = 1;
-        TLED3 = 0;
+//        TLED1 = 0;
+//        TLED2 = 0;
+//        TLED3 = 0;
         end
         else
+            TLED0 = 0;
+        if (TEMPGREEN > greenThresh)
         begin
-        TLED0 = 0;
-        TLED1 = 0;
-        TLED2 = 0;
+//        TLED0 = 0;
+        TLED1 = 1;
+//        TLED2 = 0;
+//        TLED3 = 0;
+        end
+        else
+            TLED1 = 0;
+        if (TEMPBLUE > blueThresh)
+        begin
+//        TLED0 = 0;
+//        TLED1 = 0;
+        TLED2 = 1;
+//        TLED3 = 0;
+        end
+        else
+            TLED2 = 0;
+        if (~(TLED0 & TLED1 & TLED2))
+        begin
+//        TLED0 = 0;
+//        TLED1 = 0;
+//        TLED2 = 0;
         TLED3 = 1;
         end
             
@@ -202,8 +228,9 @@ IntegerDivision DivideByClear(
 assign JA4 = TLED0;
 assign JA5 = TLED1;
 assign JA6 = TLED2;
-assign LED0 = tempCorbo;
-assign LED1 = tempCorbo2;
+assign LED0 = tempCorbo0;
+assign LED1 = tempCorbo1;
+assign LED2 = tempCorbo2;
 assign LED3 = TLED3;
 assign s2 = temps2;
 assign s3 = temps3;

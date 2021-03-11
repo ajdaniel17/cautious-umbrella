@@ -203,7 +203,9 @@ ColorSensor sensecolor(
     .LED3(LED3),
     .LED4(LED4),
     .frqdone(),
+    .divdone(),
     .FRQ(),
+    .tempquo(),
     .JA4(JA4),
     .JA5(JA5),
     .JA6(JA6)
