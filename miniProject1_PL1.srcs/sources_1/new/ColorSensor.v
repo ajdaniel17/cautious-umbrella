@@ -71,7 +71,7 @@ IntegerDivision DivideByClear(
                 FRQenable = 0;
                 done1 =1;    
             end
-            else if (~DIVenable)
+            else
                 begin
                     TEMPFRQ2 = FRQ;
                     FRQenable = 0;
@@ -84,7 +84,6 @@ IntegerDivision DivideByClear(
                 begin 
                     TEMPFRQ = tempquo;
                     DIVenable = 0;
-                    done4 = 0;
                     done1 = 1;
                 end
                 
@@ -96,6 +95,7 @@ IntegerDivision DivideByClear(
         begin
             done4 = 1;
             count <= 0;
+            done3 = 0;
         end
         else if (done3)
             count <= count +1;
@@ -154,8 +154,8 @@ IntegerDivision DivideByClear(
         
         if(done4)
             begin
-            done3 = 0;
             DIVenable = 1;
+            done4 = 0;
             end
             
         if(~done)
