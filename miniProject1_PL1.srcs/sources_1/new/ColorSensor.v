@@ -69,6 +69,7 @@ module ColorSensor(
         
         if(i == 1)
         begin
+<<<<<<< HEAD
             case(colorsetting)
                 2'd0:redFRQ  = timeperiod;
                 2'd1:blueFRQ = timeperiod;
@@ -83,10 +84,37 @@ module ColorSensor(
                 2'd2:colorsetting = 2'd0;
             endcase
         end  
+=======
+            if(colorsetting == 0)
+            begin
+                TEMPFRQ = FRQ;
+                FRQenable = 0;
+                done1 =1;    
+            end
+            else if (~DIVenable)
+                begin
+                    TEMPFRQ2 = FRQ;
+                    FRQenable = 0;
+                    done3 = 1;
+                   // DIVenable = 1;
+                end
+            
+         end
+            if(divdone)
+                begin 
+                    TEMPFRQ = tempquo;
+                    DIVenable = 0;
+                    done4 = 0;
+                    done1 = 1;
+                end
+                
+         
+>>>>>>> parent of 4e1b925 (updagte)
         
         
         if(colorsetting == 0)
         begin
+<<<<<<< HEAD
             temps2 = 0;
             temps3 = 0;
         end
@@ -94,6 +122,10 @@ module ColorSensor(
         begin 
             temps2 = 0;
             temps3 = 1;
+=======
+            done4 = 1;
+            count <= 0;
+>>>>>>> parent of 4e1b925 (updagte)
         end
         else if (colorsetting == 2)
         begin 
@@ -134,9 +166,56 @@ module ColorSensor(
         begin
             frequency = frequency +1;
 
+<<<<<<< HEAD
 
         end
         else
+=======
+                 //initial value at white   
+                 case(colorsetting)
+                 2'd0 : begin //white to red
+                 TEMPWHITE = TEMPFRQ;
+                 temps2 = 0;
+                 temps3 = 0;
+                 colorsetting = 2'd1;
+                 FRQenable = 1;
+                 end
+                 2'd1 : begin //red to green
+                 TEMPRED = TEMPFRQ;
+                 temps2 = 1;
+                 temps3 = 1;
+                 colorsetting = 2'd2;
+                 FRQenable = 1;
+                 end
+                 2'd2 : begin //green to blue
+                 TEMPGREEN = TEMPFRQ;
+                 temps2 = 0;
+                 temps3 = 1;
+                 colorsetting = 2'd3;
+                 FRQenable = 1;
+                 end
+                 2'd3 : begin //blue to white
+                 TEMPBLUE = TEMPFRQ;
+                 temps2 = 1;
+                 temps3 = 0;
+                 colorsetting = 2'd0;
+                 done = 0;
+                 end
+                 default: colorsetting = 2'd0;
+                 endcase
+                 
+                 
+                 done2 = 0;
+        end    
+        
+        if(done4)
+            begin
+            done3 = 0;
+            DIVenable = 1;
+            end
+            
+        if(~done)
+>>>>>>> parent of 4e1b925 (updagte)
         begin
 
         end
