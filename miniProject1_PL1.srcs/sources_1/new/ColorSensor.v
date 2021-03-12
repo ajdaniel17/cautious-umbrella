@@ -41,14 +41,14 @@ module ColorSensor(
     reg [31:0] TEMPFRQ2;
     reg [1:0] colorsetting = 2'd0;
     reg [31:0] TEMPRED,TEMPBLUE,TEMPGREEN,TEMPWHITE;
-    reg done = 1;
+    reg enableStore1 = 1;
     reg TLED0 = 0,TLED1 = 0,TLED2 = 0,TLED3 = 0;
-    reg[16:0] count; 
-    reg[16:0] count2;
-    reg done1=0,done2=0,done3=0,done4=0;
+    reg[16:0] divToStoreCount; 
+    reg[16:0] frqToDivCount;
+    reg doneWithDiv=0,enableStore2=0,doneWithReadFrq=0,turnOnDiv=0;
     reg [6:0] redThresh = 7'd55;
-    reg [6:0] blueThresh = 7'd30;
-    reg [6:0] greenThresh = 7'd20;
+    reg [6:0] blueThresh = 7'd45;
+    reg [6:0] greenThresh = 7'd40;
     
 ReadFrequency Readthis(
      .CLK(clock),        
@@ -78,22 +78,22 @@ IntegerDivision DivideByClear(
             //if (FRQ == 0)
                 //tempCorbo2 = 1;
             TEMPFRQ = FRQ;
-            if (TEMPFRQ == 0)
-                tempCorbo0 = 1;
+            //if (TEMPFRQ == 0)
+                //tempCorbo0 = 1;
             FRQenable = 0;
-            done1 =1;    
+            doneWithDiv =1;    
         end
         else
             begin
                 TEMPFRQ2 = FRQ;
                 FRQenable = 0;
-                if (TEMPWHITE == 0)
-                    tempCorbo1 = 1;
-                else
-                    tempCorbo2 = 1;
+                //if (TEMPWHITE == 0)
+                    //tempCorbo1 = 1;
+                //else
+                    //tempCorbo2 = 1;
  
                     //tempCorbo0 = 1;
-                    done3 = 1;
+                    doneWithReadFrq = 1;
                // DIVenable = 1;
             end
         
@@ -104,34 +104,34 @@ IntegerDivision DivideByClear(
                     //tempCorbo2 = 1;
                 TEMPFRQ = tempquo;
                 DIVenable = 0;
-                done1 = 1;
+                doneWithDiv = 1;
             end
             
      
     
     
     //Need a buffer, not sure why
-    if (count2 > 2)
+    if (frqToDivCount > 2)
     begin
-        done4 = 1;
-        count2 <= 0;
-        done3 = 0;
+        turnOnDiv = 1;
+        frqToDivCount <= 0;
+        doneWithReadFrq = 0;
     end
-    else if (done3)
-        count2 <= count2 +1;
+    else if (doneWithReadFrq)
+        frqToDivCount <= frqToDivCount +1;
         
         
     //Need a buffer, not sure why
-    if (count > 5)
+    if (divToStoreCount > 5)
     begin
-        done2 = 1;
-        count <= 0;
-        done1 = 0;
+        enableStore2 = 1;
+        divToStoreCount <= 0;
+        doneWithDiv = 0;
     end
-    else if (done1)
-        count <= count +1;
+    else if (doneWithDiv)
+        divToStoreCount <= divToStoreCount +1;
         
-    if(done2 & done)
+    if(enableStore2 & enableStore1)
     begin
      
 
@@ -167,22 +167,22 @@ IntegerDivision DivideByClear(
              temps2 = 1;
              temps3 = 0;
              colorsetting = 2'd0;
-             done = 0;
+             enableStore1 = 0;
              end
-             default: colorsetting = 2'd0;
+             //default: colorsetting = 2'd0;
              endcase
              
              
-             done2 = 0;
+             enableStore2 = 0;
     end    
     
-    if(done4)
+    if(turnOnDiv)
         begin
         DIVenable = 1;
-        done4 = 0;
+        turnOnDiv = 0;
         end
         
-    if(~done)
+    if(~enableStore1)
     begin
     FRQenable = 0;
         if(TEMPRED > redThresh)
@@ -212,16 +212,16 @@ IntegerDivision DivideByClear(
         end
         else
             TLED2 = 0;
-        if (~(TLED0 & TLED1 & TLED2))
-        begin
-//        TLED0 = 0;
-//        TLED1 = 0;
-//        TLED2 = 0;
-        TLED3 = 1;
-        end
+//        if (~(TLED0 & TLED1 & TLED2))
+//        begin
+////        TLED0 = 0;
+////        TLED1 = 0;
+////        TLED2 = 0;
+//        TLED3 = 1;
+//        end
             
     
-    done = 1;
+    enableStore1 = 1;
     FRQenable = 1;
     end
  end
