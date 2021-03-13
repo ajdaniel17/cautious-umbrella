@@ -52,7 +52,6 @@ module MovementModule(
     integer speed;
     reg [7:0]sseg;
     integer safety;
-    integer D1,D2,D3,D4;
     integer i;
     reg testFRQ;
     
@@ -63,10 +62,6 @@ module MovementModule(
     counter = 0;
     width = 0;
     temp_PWM = 0;
-    D1 = 0;
-    D2 = 1;
-    D3 = 2;
-    D4 = 3;
     end
     
     
@@ -93,21 +88,21 @@ module MovementModule(
            temp_PWM <= 0;   
               
             
-        //If Current is over 1Amp for over .07 seconds, change the safety state
-        if (control1 || control2) begin
-        //Counts to make sure motors are pulling more than 1 Amp for .07 seconds
-         if(safety_count > 7000000)
-            safety=1; 
-         else 
-            safety_count <= safety_count +1;     
-        end
+//        //If Current is over 1Amp for over .07 seconds, change the safety state
+//        if (control1 || control2) begin
+//        //Counts to make sure motors are pulling more than 1 Amp for .07 seconds
+//         if(safety_count > 7000000)
+//            safety=1; 
+//         else 
+//            safety_count <= safety_count +1;     
+//        end
           
-        else begin 
-            safety_count = 0;
-            //reset safety state
-            if(btnC) 
-                safety = 0;
-        end
+//        else begin 
+//            safety_count = 0;
+//            //reset safety state
+//            if(btnC) 
+//                safety = 0;
+//        end
         
             
     end

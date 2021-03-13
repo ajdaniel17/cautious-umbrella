@@ -23,7 +23,7 @@
 module SevenSegmentDisplay(
  input clock, reset,
  input [3:0] in0, in1, in2, in3,  //the 4 inputs for each display
- output a, b, c, d, e, f, g, dp, //the individual LED output for the seven segment along with the digital point
+ output s0, s1, s2, s3, s4, s5, s6, dp, //the individual LED output for the seven segment along with the digital point
  output [3:0] an   // the 4 bit enable signal
  );
 
@@ -97,7 +97,7 @@ always @ (*)
    default : sseg_temp = 7'b0111111; //dash
   endcase
  end
-assign {g, f, e, d, c, b, a} = sseg_temp; //concatenate the outputs to the register, this is just a more neat way of doing this.
+assign {s6, s5, s4, s3, s2, s1, s0} = sseg_temp; //concatenate the outputs to the register, this is just a more neat way of doing this.
 // I could have done in the case statement: 4'd0 : {g, f, e, d, c, b, a} = 7'b1000000; 
 // its the same thing.. write however you like it
 
