@@ -80,18 +80,13 @@ ColorSensor sensecolor(
     .colorinput(colorinput),
     .s2(colors2),
     .s3(colors3),
-    .LED0(LED0),
-    .LED1(LED1),
-    .LED2(LED2),
-    .LED3(LED3),
-    .LED4(LED4),
     .frqdone(),
     .divdone(),
     .FRQ(),
     .tempquo(),
-    .JA4(JA4),
-    .JA5(JA5),
-    .JA6(JA6)
+    .RED(JA4),
+    .GREEN(JA5),
+    .BLUE(JA6)
     );
     
 //D4,D3,D2,D1 are what get displayed, in that order 
