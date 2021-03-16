@@ -28,7 +28,8 @@ module IntegerDivision(
     //Division Variables
     input[31:0] Dividend, Divisor,
     input clock,
-    output reg [31:0] Quotient,Remainder
+    output reg [31:0] Quotient,Remainder,
+    input Percentagemode
     );
    reg [31:0]tempvar;
    
@@ -42,7 +43,10 @@ module IntegerDivision(
             done = 0;
             Quotient = 0;
             Remainder = 0;
-            tempvar = Dividend*100;
+            if(Percentagemode)
+                tempvar = Dividend*100;
+            else 
+                tempvar = Dividend;
 
         end
         else

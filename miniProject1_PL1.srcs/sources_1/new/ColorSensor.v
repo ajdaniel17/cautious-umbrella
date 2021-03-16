@@ -61,7 +61,8 @@ IntegerDivision DivideByClear(
 .Divisor(TEMPWHITE),
 .clock(clock),
 .Quotient(tempquo),
-.Remainder()
+.Remainder(),
+.Percentagemode(1)
 );
      
  always @(posedge clock)

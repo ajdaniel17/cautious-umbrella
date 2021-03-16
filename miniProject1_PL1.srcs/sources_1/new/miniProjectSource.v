@@ -50,9 +50,22 @@ module miniProjectSource(
     output colors2,colors3,
     output [3:0] an,
     output testfrq,
-    output JA4,JA5,JA6
+    output JA4,JA5,JA6,
+    input JB2,
+    input[4:0] D1,D2,D3,D4
     );
-   
+
+
+Encoder_Reader readEncoder(
+    .signal(JB2),
+    .clock(clock),
+    .tic_count(),
+    .D1(D1),
+    .D2(D2),
+    .D3(D3),
+    .D4(D4)   
+    );
+    
 MovementModule moveRover(
     .clock(clock),
     .in0(in0),
@@ -101,10 +114,10 @@ SevenSegmentDisplay SevenDisplay(
 .s5(s5),
 .s6(s6),
 .dp(dp),
-.in0(),
-.in1(),
-.in2(),
-.in3(),
+.in0(D1),
+.in1(D2),
+.in2(D3),
+.in3(D4),
 .an(an)
 );
 
