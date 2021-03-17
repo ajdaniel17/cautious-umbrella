@@ -22,7 +22,7 @@
 
 module SevenSegmentDisplay(
  input clock, reset,
- input [3:0] in0, in1, in2, in3,  //the 4 inputs for each display
+ input [4:0] input0, input1, input2, input3,  //the 4 inputs for each display
  output s0, s1, s2, s3, s4, s5, s6, dp, //the individual LED output for the seven segment along with the digital point
  output [3:0] an   // the 4 bit enable signal
  );
@@ -48,25 +48,25 @@ always @ (*)
    
    2'b00 :  //When the 2 MSB's are 00 enable the fourth display
     begin
-     sseg = in0;
+     sseg = input0;
      an_temp = 4'b1110;
     end
    
    2'b01:  //When the 2 MSB's are 01 enable the third display
     begin
-     sseg = in1;
+     sseg = input1;
      an_temp = 4'b1101;
     end
    
    2'b10:  //When the 2 MSB's are 10 enable the second display
     begin
-     sseg = in2;
+     sseg = input2;
      an_temp = 4'b1011;
     end
     
    2'b11:  //When the 2 MSB's are 11 enable the first display
     begin
-     sseg = in3;
+     sseg = input3;
      an_temp = 4'b0111;
     end
   endcase

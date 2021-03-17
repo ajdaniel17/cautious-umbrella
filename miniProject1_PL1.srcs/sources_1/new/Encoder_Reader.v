@@ -23,15 +23,15 @@
 module Encoder_Reader(
     input signal,clock,
     output reg [15:0] tic_count,
-    output [4:0] D1,D2,D3,D4,
+    output reg [4:0] D1,D2,D3,D4,
     input divdone1,divdone2,divdone3,divdone4,   
-    input [15:0] tempD1,tempD2,tempD3,tempD4,
-    input [31:0] bridge1,bridge2,bridge3
+    input [15:0] tempD1,tempD2,tempD3,tempD4
         );
-    
+        
+    wire[31:0] bridge1,bridge2,bridge3;
     reg last = 0;
     reg DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
-    reg [15:0] temp2D1,temp2D2,temp2D3,temp2D4;
+   // reg [15:0] temp2D1,temp2D2,temp2D3,temp2D4;
 
         
 IntegerDivision Thou(
@@ -93,36 +93,33 @@ IntegerDivision Uno(
     
         if(divdone1)
         begin 
-            temp2D1 = tempD1;
+            D1 = tempD1;
             DIVenable1 = 0;
             DIVenable2 = 1;
         end
         
         if(divdone2)
         begin 
-            temp2D2 = tempD2;
+            D2 = tempD2;
             DIVenable2 = 0;
             DIVenable3 = 1;
         end
         
         if(divdone3)
         begin 
-            temp2D3 = tempD3;
+            D3 = tempD3;
             DIVenable3 = 0;
             DIVenable4 = 1;
         end
         
         if(divdone4)
         begin 
-            temp2D4 = tempD4;
+            D4 = tempD4;
             DIVenable4 = 0;
         end
    
             
     end
 
-assign D1 = temp2D1;
-assign D2 = temp2D2;
-assign D3 = temp2D3;
-assign D4 = temp2D4;
+
 endmodule
