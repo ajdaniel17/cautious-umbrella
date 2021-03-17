@@ -160,8 +160,8 @@ set_property PACKAGE_PIN A16 [get_ports {control2}]
 set_property PACKAGE_PIN B15 [get_ports {JB2}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {JB2}]
 ###Sch name = JB4
-#set_property PACKAGE_PIN B16 [get_ports {JB[3]}]					
-#	set_property IOSTANDARD LVCMOS33 [get_ports {JB[3]}]
+set_property PACKAGE_PIN B16 [get_ports {JB3}]					
+	set_property IOSTANDARD LVCMOS33 [get_ports {JB3}]
 ###Sch name = JB7
 #set_property PACKAGE_PIN A15 [get_ports {JB[4]}]					
 #	set_property IOSTANDARD LVCMOS33 [get_ports {JB[4]}]

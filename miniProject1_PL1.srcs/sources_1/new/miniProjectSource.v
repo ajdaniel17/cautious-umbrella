@@ -58,7 +58,8 @@ module miniProjectSource(
     //reg [4:0] tempD1,tempD2,tempD3,tempD4;
     wire [4:0]D1,D2,D3,D4;
 Encoder_Reader readEncoder(
-    .signal(JB2),
+    .signalA(JB2),
+    .signalB(JB3),
     .clock(clock),
     .tic_count(),
     .D1(D1),

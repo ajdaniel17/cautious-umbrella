@@ -21,15 +21,15 @@
 
 
 module Encoder_Reader(
-    input signal,clock,
-    output reg [15:0] tic_count = 0,
+    input signalA,signalB,clock,
+    output reg signed[31:0] tic_count = 0,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 = 0,
     input divdone1,divdone2,divdone3,divdone4,   
     input [15:0] tempD1,tempD2,tempD3,tempD4
         );
-        
+    reg [1:0] Combined_Signal = 00;
     wire[31:0] bridge1,bridge2,bridge3;
-    reg last = 0;
+    reg [1:0]lastCS = 00;
     reg DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
    // reg [15:0] temp2D1,temp2D2,temp2D3,temp2D4;
 
@@ -78,19 +78,22 @@ IntegerDivision Uno(
 .Percentagemode(0)
 );
     always @ (posedge clock)
-        last <= signal;
+        lastCS <= {signalA , signalB};
         
    
     
     always @ (posedge clock)
     begin
-        if(signal != last)
+        Combined_Signal <= {signalA , signalB};
+        if(Combined_Signal == lastCS)
         begin
-            tic_count <= tic_count + 1;
-            DIVenable1 = 1;
+            tic_count <= tic_count;
         end
-    
-    
+        else if((lastCS == 2'd1 & Combined_Signal == 2'd0) || (lastCS == 2'd0 & Combined_Signal == 2'd2) || (lastCS == 2'd2 & Combined_Signal == 2'd3) ||( lastCS == 2'd3 & Combined_Signal == 2'd1))
+            tic_count <= tic_count + 1;
+        else if((lastCS == 2'd0 & Combined_Signal == 2'd1) || (lastCS == 2'd1 & Combined_Signal == 2'd3) || (lastCS == 2'd2 & Combined_Signal == 2'd0) || (lastCS == 2'd3 & Combined_Signal == 2'd2))
+            tic_count <= tic_count - 1;
+            
         if(divdone1)
         begin 
             D1 = tempD1;
