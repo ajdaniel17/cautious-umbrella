@@ -22,8 +22,8 @@
 
 module Encoder_Reader(
     input signal,clock,
-    output reg [15:0] tic_count,
-    output reg [4:0] D1,D2,D3,D4,
+    output reg [15:0] tic_count = 0,
+    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 = 0,
     input divdone1,divdone2,divdone3,divdone4,   
     input [15:0] tempD1,tempD2,tempD3,tempD4
         );
