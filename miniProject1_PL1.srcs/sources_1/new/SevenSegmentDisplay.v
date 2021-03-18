@@ -93,6 +93,7 @@ always @ (*)
    4'd11 : sseg_temp = 7'b0101111; //to display r
    4'd12 : sseg_temp = 7'b0000110; //to display E
    4'd13 : sseg_temp = 7'b0100001; //to display d
+   4'd15 : sseg_temp = 7'b1111111; //to display nothing
    
    default : sseg_temp = 7'b0111111; //dash
   endcase

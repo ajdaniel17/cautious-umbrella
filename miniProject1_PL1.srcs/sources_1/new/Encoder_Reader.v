@@ -23,7 +23,7 @@
 module Encoder_Reader(
     input signalA,signalB,clock,
     output reg signed [15:0] tic_count = 0,
-    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 = 0,
+    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
     input divdone1,divdone2,divdone3,divdone4,   
     input [15:0] tempD1,tempD2,tempD3,tempD4
         );
@@ -92,6 +92,7 @@ IntegerDivision Uno(
                 tic_count <= tic_count - $signed(1);
             2'd2:
                 tic_count <= tic_count + $signed(1);
+
             endcase
         end
         2'd1:
@@ -101,6 +102,7 @@ IntegerDivision Uno(
                 tic_count <= tic_count + $signed(1);
             2'd3:
                 tic_count <= tic_count - $signed(1);
+
             endcase
         end
         2'd2:
@@ -109,7 +111,8 @@ IntegerDivision Uno(
             2'd0:
                 tic_count <= tic_count - $signed(1);
             2'd3:
-                tic_count <= tic_count + $signed(1);
+               tic_count <= tic_count + $signed(1);
+      
             endcase
         end
         2'd3:
@@ -119,8 +122,12 @@ IntegerDivision Uno(
                 tic_count <= tic_count + $signed(1);
             2'd2:
                 tic_count <= tic_count - $signed(1);
+     
             endcase
+        
         end
+        default:
+                D4 = 4'd15;
         endcase
  
             

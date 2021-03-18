@@ -51,15 +51,30 @@ module miniProjectSource(
     output [3:0] an,
     output testfrq,
     output JA4,JA5,JA6,
-    input JB2
+    input JB2,
+    input JB3
+
     //input[4:0] D1,D2,D3,D4,
     //output reg [4:0] oD1,oD2,oD3,oD4
     );
     //reg [4:0] tempD1,tempD2,tempD3,tempD4;
     wire [4:0]D1,D2,D3,D4;
     wire signed [15:0] tic_count;
+    reg count = 0;
+    reg clk2 = 0;
     
-    
+always @ (posedge clock)
+begin
+if(count > 1)
+begin
+count = 0;
+clk2 = ~clk2;
+end
+else
+    count = count + 1;
+
+end
+
 Encoder_Reader readEncoder(
     .signalA(JB2),
     .signalB(JB3),
@@ -100,7 +115,7 @@ MovementModule moveRover(
     .e(e),
     .f(f)
     );   
-   
+   /*
 ColorSensor sensecolor(
     .clock(clock),
     .colorinput(colorinput),
@@ -113,7 +128,7 @@ ColorSensor sensecolor(
     .RED(JA4),
     .GREEN(JA5),
     .BLUE(JA6)
-    );
+    );*/
     
 //D4,D3,D2,D1 are what get displayed, in that order 
 SevenSegmentDisplay SevenDisplay(
