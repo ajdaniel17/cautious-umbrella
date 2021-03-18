@@ -60,7 +60,7 @@ module IntegerDivision(
         begin
                 if(tempvar >= Divisor)
                 begin
-                    Quotient = Quotient + $signed(1);
+                    Quotient = Quotient + 1;
                     tempvar = tempvar - Divisor;
                 end
                 else

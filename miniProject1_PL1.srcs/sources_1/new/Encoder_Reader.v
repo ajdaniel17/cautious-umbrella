@@ -89,29 +89,45 @@ IntegerDivision Uno(
         begin
             case(Combined_Signal)
             2'd1:
+            begin
                 tic_count <= tic_count - $signed(1);
+                DIVenable1 = 1; 
+            end
             2'd2:
+            begin
                 tic_count <= tic_count + $signed(1);
-
+                DIVenable1 = 1;
+            end
             endcase
         end
         2'd1:
         begin
             case(Combined_Signal)
             2'd0:
+            begin
                 tic_count <= tic_count + $signed(1);
+                DIVenable1 = 1;
+            end
             2'd3:
+            begin
                 tic_count <= tic_count - $signed(1);
-
+                DIVenable1 = 1;
+            end
             endcase
         end
         2'd2:
         begin
             case(Combined_Signal)
             2'd0:
+            begin
                 tic_count <= tic_count - $signed(1);
+                DIVenable1 = 1;
+            end
             2'd3:
+            begin
                tic_count <= tic_count + $signed(1);
+               DIVenable1 = 1;
+            end
       
             endcase
         end
@@ -119,9 +135,15 @@ IntegerDivision Uno(
         begin
             case(Combined_Signal)
             2'd1:
+            begin
                 tic_count <= tic_count + $signed(1);
+                DIVenable1 = 1;
+            end
             2'd2:
+            begin
                 tic_count <= tic_count - $signed(1);
+                DIVenable1 = 1;
+            end
      
             endcase
         
