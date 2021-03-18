@@ -22,7 +22,7 @@
 
 module Encoder_Reader(
     input signalA,signalB,clock,
-    output reg signed [15:0] tic_count = 0,
+    output reg signed [31:0] tic_count = 0,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
     input divdone1,divdone2,divdone3,divdone4,   
     input [15:0] tempD1,tempD2,tempD3,tempD4
@@ -38,7 +38,7 @@ IntegerDivision Thou(
 .enable(DIVenable1),
 .done(divdone1),
 .Dividend(tic_count),
-.Divisor($signed(10'd1000)),
+.Divisor($signed(32'd1000)),
 .clock(clock),
 .Quotient(tempD1),
 .Remainder(bridge1),
@@ -49,7 +49,7 @@ IntegerDivision Hun(
 .enable(DIVenable2),
 .done(divdone2),
 .Dividend(bridge1),
-.Divisor($signed(10'd100)),
+.Divisor($signed(32'd100)),
 .clock(clock),
 .Quotient(tempD2),
 .Remainder(bridge2),
@@ -60,7 +60,7 @@ IntegerDivision Ten(
 .enable(DIVenable3),
 .done(divdone3),
 .Dividend(bridge2),
-.Divisor($signed(10'd10)),
+.Divisor($signed(32'd10)),
 .clock(clock),
 .Quotient(tempD3),
 .Remainder(bridge3),
@@ -71,7 +71,7 @@ IntegerDivision Uno(
 .enable(DIVenable4),
 .done(divdone4),
 .Dividend(bridge3),
-.Divisor($signed(10'd1)),
+.Divisor($signed(32'd1)),
 .clock(clock),
 .Quotient(tempD4),
 .Remainder(),
@@ -126,8 +126,6 @@ IntegerDivision Uno(
             endcase
         
         end
-        default:
-                D4 = 4'd15;
         endcase
  
             

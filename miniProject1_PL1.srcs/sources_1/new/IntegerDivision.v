@@ -28,10 +28,11 @@ module IntegerDivision(
     //Division Variables
     input signed[31:0] Dividend, Divisor,
     input clock,
-    output reg signed[31:0] Quotient,Remainder,
+    output reg [15:0] Quotient,
+    output reg signed [31:0] Remainder,
     input Percentagemode
     );
-   reg [31:0]tempvar;
+   reg signed[31:0]tempvar;
    
     always @ (posedge clock)
         begin
@@ -44,31 +45,22 @@ module IntegerDivision(
             Quotient = 0;
             Remainder = 0;
             if(Percentagemode)
+                if(Dividend > $signed(32'd0))
                 tempvar = Dividend*100;
+                else
+                tempvar = Dividend*-100;
             else 
+                if(Dividend > $signed(32'd0))
                 tempvar = Dividend;
+                else
+                tempvar = Dividend*-1;
 
         end
         else
-            begin
-            if(Divisor > 0)
-            begin
+        begin
                 if(tempvar >= Divisor)
                 begin
-                    Quotient = Quotient + 1;
-                    tempvar = tempvar - Divisor;
-                end
-                else
-                begin
-                    Remainder = tempvar;
-                    done = 1;
-                end
-            end
-            else
-            begin
-                if(tempvar <= -1*Divisor)
-                begin
-                    Quotient = Quotient + 1;
+                    Quotient = Quotient + $signed(1);
                     tempvar = tempvar - Divisor;
                 end
                 else
@@ -77,7 +69,6 @@ module IntegerDivision(
                     done = 1;
                 end
             
-            end
         end
     end
     
