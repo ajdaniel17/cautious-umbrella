@@ -45,7 +45,7 @@ module miniProjectSource(
     input testport,
     output a,b,c,d,e,f,
     output s0,s1,s2,s3,s4,s5,s6,dp,
-    output LED0,LED1,LED2,LED3,LED4,
+    output reg LED0,LED1,LED2,LED3,LED4,
     input colorinput,
     output colors2,colors3,
     output [3:0] an,
@@ -57,11 +57,14 @@ module miniProjectSource(
     );
     //reg [4:0] tempD1,tempD2,tempD3,tempD4;
     wire [4:0]D1,D2,D3,D4;
+    wire signed [15:0] tic_count;
+    
+    
 Encoder_Reader readEncoder(
     .signalA(JB2),
     .signalB(JB3),
     .clock(clock),
-    .tic_count(),
+    .tic_count(tic_count),
     .D1(D1),
     .D2(D2),
     .D3(D3),
@@ -131,4 +134,16 @@ SevenSegmentDisplay SevenDisplay(
 .an(an)
 );
 
+always @ (posedge clock)
+begin
+if(tic_count > 5)
+    LED0 = 1;
+else
+    LED0 = 0;
+    
+if(tic_count < -5)
+    LED1 = 1;
+else 
+    LED1 = 0;
+end
 endmodule

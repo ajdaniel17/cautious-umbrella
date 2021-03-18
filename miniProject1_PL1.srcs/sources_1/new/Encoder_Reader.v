@@ -22,13 +22,13 @@
 
 module Encoder_Reader(
     input signalA,signalB,clock,
-    output reg signed[31:0] tic_count = 0,
+    output reg signed [15:0] tic_count = 0,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 = 0,
     input divdone1,divdone2,divdone3,divdone4,   
     input [15:0] tempD1,tempD2,tempD3,tempD4
         );
-    reg [1:0] Combined_Signal = 00;
-    wire[31:0] bridge1,bridge2,bridge3;
+    wire [1:0] Combined_Signal = {signalA,signalB};
+    wire signed[31:0] bridge1,bridge2,bridge3;
     reg [1:0]lastCS = 00;
     reg DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
    // reg [15:0] temp2D1,temp2D2,temp2D3,temp2D4;
@@ -38,7 +38,7 @@ IntegerDivision Thou(
 .enable(DIVenable1),
 .done(divdone1),
 .Dividend(tic_count),
-.Divisor(10'd1000),
+.Divisor($signed(10'd1000)),
 .clock(clock),
 .Quotient(tempD1),
 .Remainder(bridge1),
@@ -49,7 +49,7 @@ IntegerDivision Hun(
 .enable(DIVenable2),
 .done(divdone2),
 .Dividend(bridge1),
-.Divisor(10'd100),
+.Divisor($signed(10'd100)),
 .clock(clock),
 .Quotient(tempD2),
 .Remainder(bridge2),
@@ -60,7 +60,7 @@ IntegerDivision Ten(
 .enable(DIVenable3),
 .done(divdone3),
 .Dividend(bridge2),
-.Divisor(10'd10),
+.Divisor($signed(10'd10)),
 .clock(clock),
 .Quotient(tempD3),
 .Remainder(bridge3),
@@ -71,7 +71,7 @@ IntegerDivision Uno(
 .enable(DIVenable4),
 .done(divdone4),
 .Dividend(bridge3),
-.Divisor(10'd1),
+.Divisor($signed(10'd1)),
 .clock(clock),
 .Quotient(tempD4),
 .Remainder(),
@@ -84,15 +84,45 @@ IntegerDivision Uno(
     
     always @ (posedge clock)
     begin
-        Combined_Signal <= {signalA , signalB};
-        if(Combined_Signal == lastCS)
+        case(lastCS)
+        2'd0:
         begin
-            tic_count <= tic_count;
+            case(Combined_Signal)
+            2'd1:
+                tic_count <= tic_count - $signed(1);
+            2'd2:
+                tic_count <= tic_count + $signed(1);
+            endcase
         end
-        else if((lastCS == 2'd1 & Combined_Signal == 2'd0) || (lastCS == 2'd0 & Combined_Signal == 2'd2) || (lastCS == 2'd2 & Combined_Signal == 2'd3) ||( lastCS == 2'd3 & Combined_Signal == 2'd1))
-            tic_count <= tic_count + 1;
-        else if((lastCS == 2'd0 & Combined_Signal == 2'd1) || (lastCS == 2'd1 & Combined_Signal == 2'd3) || (lastCS == 2'd2 & Combined_Signal == 2'd0) || (lastCS == 2'd3 & Combined_Signal == 2'd2))
-            tic_count <= tic_count - 1;
+        2'd1:
+        begin
+            case(Combined_Signal)
+            2'd0:
+                tic_count <= tic_count + $signed(1);
+            2'd3:
+                tic_count <= tic_count - $signed(1);
+            endcase
+        end
+        2'd2:
+        begin
+            case(Combined_Signal)
+            2'd0:
+                tic_count <= tic_count - $signed(1);
+            2'd3:
+                tic_count <= tic_count + $signed(1);
+            endcase
+        end
+        2'd3:
+        begin
+            case(Combined_Signal)
+            2'd1:
+                tic_count <= tic_count + $signed(1);
+            2'd2:
+                tic_count <= tic_count - $signed(1);
+            endcase
+        end
+        endcase
+ 
             
         if(divdone1)
         begin 

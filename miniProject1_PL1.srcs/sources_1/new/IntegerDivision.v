@@ -26,9 +26,9 @@ module IntegerDivision(
     output reg done,
     
     //Division Variables
-    input[31:0] Dividend, Divisor,
+    input signed[31:0] Dividend, Divisor,
     input clock,
-    output reg [31:0] Quotient,Remainder,
+    output reg signed[31:0] Quotient,Remainder,
     input Percentagemode
     );
    reg [31:0]tempvar;
@@ -50,16 +50,33 @@ module IntegerDivision(
 
         end
         else
-        begin
-            if(tempvar >= Divisor)
             begin
-                Quotient = Quotient + 1;
-                tempvar = tempvar - Divisor;
+            if(Divisor > 0)
+            begin
+                if(tempvar >= Divisor)
+                begin
+                    Quotient = Quotient + 1;
+                    tempvar = tempvar - Divisor;
+                end
+                else
+                begin
+                    Remainder = tempvar;
+                    done = 1;
+                end
             end
             else
             begin
-                Remainder = tempvar;
-                done = 1;
+                if(tempvar <= -1*Divisor)
+                begin
+                    Quotient = Quotient + 1;
+                    tempvar = tempvar - Divisor;
+                end
+                else
+                begin
+                    Remainder = tempvar;
+                    done = 1;
+                end
+            
             end
         end
     end
