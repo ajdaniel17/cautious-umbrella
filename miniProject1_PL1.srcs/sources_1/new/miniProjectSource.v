@@ -52,7 +52,8 @@ module miniProjectSource(
     output testfrq,
     output JA4,JA5,JA6,
     input JB2,
-    input JB3
+    input JB3,
+    input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n
 
     //input[4:0] D1,D2,D3,D4,
     //output reg [4:0] oD1,oD2,oD3,oD4
@@ -62,6 +63,7 @@ module miniProjectSource(
     wire signed [15:0] tic_count;
     reg count = 0;
     reg clk2 = 0;
+    wire signed[31:0] bridge1,bridge2,bridge3;
     
 always @ (posedge clock)
 begin
@@ -75,6 +77,24 @@ else
 
 end
 
+Distance_Sensor readDistance(
+.JX1(JX1),
+.JX1n(JX1n),
+.JX2(JX2),
+.JX2n(JX2n),
+.JX3(JX3),
+.JX3n(JX3n),
+.JX4(JX4),
+.JX4n(JX4n),
+.clock(clock),
+.vp_in(),
+.vn_in(),
+.D1(D1),
+.D2(D2),
+.D3(D3),
+.D4(D4)
+);
+/*
 Encoder_Reader readEncoder(
     .signalA(JB2),
     .signalB(JB3),
@@ -92,8 +112,8 @@ Encoder_Reader readEncoder(
     .tempD2(),
     .tempD3(),
     .tempD4()
-    );
-    
+    );*/
+    /*
 MovementModule moveRover(
     .clock(clock),
     .in0(in0),
@@ -114,7 +134,7 @@ MovementModule moveRover(
     .d(d),
     .e(e),
     .f(f)
-    );   
+    );   */
    /*
 ColorSensor sensecolor(
     .clock(clock),
