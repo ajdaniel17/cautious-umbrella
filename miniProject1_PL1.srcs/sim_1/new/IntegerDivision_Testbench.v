@@ -28,17 +28,20 @@ module IntegerDivision_Testbench(
     wire done;
     
     //Division Variables
-    reg [31:0]Dividend, Divisor;
+    reg signed [31:0]Dividend, Divisor;
     reg clock;
-    wire[31:0] Quotient,Remainder;
+    wire [15:0] Quotient; 
+    wire signed [31:0] Remainder;
+    reg Percentagemode;
  
     
-    IntegerDivision UUT (enable,done,Dividend,Divisor,clock,Quotient,Remainder);
+    IntegerDivision UUT (enable,done,Dividend,Divisor,clock,Quotient,Remainder,Percentagemode);
     
     initial
         begin
         clock = 0;
         enable = 0;
+        Percentagemode = 1;
         Dividend = 32'd10500;
         Divisor = 32'd30000;
         #10;
@@ -50,8 +53,9 @@ module IntegerDivision_Testbench(
         enable = 0;
         
         #10;
-        Dividend = 32'd1000;
-        Divisor = 32'd64;
+        Percentagemode = 0;
+        Dividend = $signed(-1000);
+        Divisor = $signed(32'd64);
         #10;
         enable = 1;
         while (~done) begin

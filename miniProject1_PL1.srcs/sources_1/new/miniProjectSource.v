@@ -50,7 +50,8 @@ module miniProjectSource(
     output colors2,colors3,
     output [3:0] an,
     output testfrq,
-    output JA4,JA5,JA6,
+    output JA4,JA6,
+    input JA5,
     input JB2,
     input JB3,
     input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n
@@ -61,22 +62,37 @@ module miniProjectSource(
     //reg [4:0] tempD1,tempD2,tempD3,tempD4;
     wire [4:0]D1,D2,D3,D4;
     wire signed [15:0] tic_count;
-    reg count = 0;
+    reg [31:0] count1 = 0;
+    reg [31:0] count2 = 0;
+    reg counter1 = 1;
+    reg counter2 = 0;
     reg clk2 = 0;
     wire signed[31:0] bridge1,bridge2,bridge3;
     
-always @ (posedge clock)
-begin
-if(count > 1)
-begin
-count = 0;
-clk2 = ~clk2;
-end
-else
-    count = count + 1;
 
-end
 
+UltraSonic_DistanceSensor Distance1(
+.clock(clock),
+.echo(JA5),
+.trigger(JA4),
+.distance(),
+.timecount(),
+.divdone(),
+.lastecho(),
+.D1(D1),
+.D2(D2),
+.D3(D3),
+.D4(D4),  
+.divdone1(),
+.divdone2(),
+.divdone3(),
+.divdone4(),   
+.tempD1(),
+.tempD2(),
+.tempD3(),
+.tempD4()
+); 
+/*
 Distance_Sensor readDistance(
 .JX1(JX1),
 .JX1n(JX1n),
@@ -94,6 +110,7 @@ Distance_Sensor readDistance(
 .D3(D3),
 .D4(D4)
 );
+*/
 /*
 Encoder_Reader readEncoder(
     .signalA(JB2),

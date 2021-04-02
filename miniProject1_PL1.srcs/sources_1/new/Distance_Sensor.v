@@ -24,17 +24,28 @@ module Distance_Sensor(
     input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n,
     input clock,
     input vp_in,vn_in,
-    output [4:0] D1,D2,D3,D4
+    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
+    input divdone1,divdone2,divdone3,divdone4,   
+    input [15:0] tempD1,tempD2,tempD3,tempD4,
+    input [15:0] data
     );
+    wire signed[31:0] bridge1,bridge2,bridge3;
+    reg DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
     wire enable;
+    reg countstart;
     reg [7:0] Address_in = 8'h16;
-    wire [15:0] data;
+    
+    reg [11:0] datain;
     reg [32:0] count;
     localparam S_IDLE = 0;
     localparam S_FRAME_WAIT = 1;
     localparam S_CONVERSION = 2;
     reg [1:0] state = S_IDLE;
     reg [15:0] sseg_data;
+    reg [31:0] fucker;
+    reg [31:0] fucker2;
+    reg [31:0] counter = 0;
+    reg startdivide;
 
     //binary to decimal converter signals
     reg b2d_start;
@@ -67,7 +78,93 @@ module Distance_Sensor(
         .drdy_out(ready)   
     );
     
+IntegerDivision Thou(
+.enable(DIVenable1),
+.done(divdone1),
+.Dividend(fucker),
+.Divisor($signed(32'd1000000)),
+.clock(clock),
+.Quotient(tempD1),
+.Remainder(bridge1),
+.Percentagemode(0)
+);
+
+IntegerDivision Hun(
+.enable(DIVenable2),
+.done(divdone2),
+.Dividend(bridge1),
+.Divisor($signed(32'd100000)),
+.clock(clock),
+.Quotient(tempD2),
+.Remainder(bridge2),
+.Percentagemode(0)
+);
+
+IntegerDivision Ten(
+.enable(DIVenable3),
+.done(divdone3),
+.Dividend(bridge2),
+.Divisor($signed(32'd10000)),
+.clock(clock),
+.Quotient(tempD3),
+.Remainder(bridge3),
+.Percentagemode(0)
+);
+
+IntegerDivision Uno(
+.enable(DIVenable4),
+.done(divdone4),
+.Dividend(bridge3),
+.Divisor($signed(32'd1000)),
+.clock(clock),
+.Quotient(tempD4),
+.Remainder(),
+.Percentagemode(0)
+);
+    
     always @ (posedge(clock)) begin
+    
+ 
+    
+    if (counter > 10000000)
+    begin
+        datain = data[15:4];
+        fucker = (datain * 32'd244);
+        DIVenable1 = 1;
+        
+    end
+    else
+        counter <= counter +1;
+        
+    if(divdone1)
+        begin 
+            D1 = tempD1;
+            DIVenable1 = 0;
+            DIVenable2 = 1;
+        end
+        
+        if(divdone2)
+        begin 
+            D2 = tempD2;
+            DIVenable2 = 0;
+            DIVenable3 = 1;
+        end
+        
+        if(divdone3)
+        begin 
+            D3 = tempD3;
+            DIVenable3 = 0;
+            DIVenable4 = 1;
+        end
+        
+        if(divdone4)
+        begin 
+            D4 = tempD4;
+            DIVenable4 = 0;
+            counter = 0;
+        end
+    
+    /*
         case (state)
         S_IDLE: begin
             state <= S_FRAME_WAIT;
@@ -94,9 +191,10 @@ module Distance_Sensor(
             end
         end
         endcase
+        */
     end
 
-
+/*
     bin2dec m_b2d (
         .clk(clock),
         .start(b2d_start),
@@ -104,11 +202,8 @@ module Distance_Sensor(
         .done(b2d_done),
         .dout(b2d_dout)
     );
-    
-assign D1 = sseg_data[15:12];
-assign D2 = sseg_data[11:8];
-assign D3 = sseg_data[7:4];
-assign D4 = sseg_data[3:0];
+    */
+
 
 
 

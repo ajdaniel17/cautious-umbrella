@@ -28,7 +28,7 @@ module IntegerDivision(
     //Division Variables
     input signed[31:0] Dividend, Divisor,
     input clock,
-    output reg [15:0] Quotient,
+    output reg [31:0] Quotient,
     output reg signed [31:0] Remainder,
     input Percentagemode
     );
