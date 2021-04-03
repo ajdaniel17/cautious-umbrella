@@ -42,7 +42,7 @@ module UltraSonic_DistanceSensor(
     //reg DIVenable = 0;           
     reg [3:0]state = 0;
     reg [31:0] count = 0;
-    reg [31:0] divisorZ = 32'd148;
+    reg [31:0] divisorZ = 32'd14800;
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
     reg [31:0]tempdistance2;
@@ -66,7 +66,7 @@ IntegerDivision SoundToInch(
 IntegerDivision Thou(
 .enable(DIVenable1),
 .done(divdone1),
-.Dividend(tempdistance2*1000),
+.Dividend(tempdistance2*10),
 .Divisor(32'd1000),
 .clock(clock),
 .Quotient(tempD1),
@@ -136,7 +136,7 @@ IntegerDivision Uno(
             end
             else
             begin
-              //  timecount = timecount + 1;
+                timecount = timecount + 1;
                 state = 3;
                 DIVenable = 1;
             end
@@ -179,6 +179,7 @@ IntegerDivision Uno(
             DIVenable4 = 0;
             timecount = 0;
             state = 0;
+            trigger = 1;
         end
         
         
