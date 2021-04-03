@@ -38,7 +38,8 @@ module UltraSonic_DistanceSensor(
                WAITING = 1,
                COUNTTIME= 2,
                CONVERTING = 3,
-               DISPLAY = 4;
+               DISPLAY = 4,
+               BUFFER = 5;
     //reg DIVenable = 0;           
     reg [3:0]state = 0;
     reg [31:0] count = 0;
@@ -116,6 +117,7 @@ IntegerDivision Uno(
         START: begin
             if(count > 1000)
             begin
+                timecount = 0;
                 count = 0;
                 state = 1;
                 trigger = 0;
@@ -124,22 +126,41 @@ IntegerDivision Uno(
                 count <= count + 1;
         end
         WAITING: begin
-            if (echo != lastecho)
+            if (echo != lastecho) begin
                 state = 2;
+                count = 0;
+            end
+            
+            if(count > 50000000)
+            begin
+                count = 0;
+                state = 0;
+                trigger = 1;
+            end
+            else
+                count <= count + 1;
         end
-        
-        
         COUNTTIME: begin
             if(echo == lastecho)
             begin
                 timecount = timecount + 1;
             end
             else
-            begin
+            begin  
                 timecount = timecount + 1;
                 state = 3;
+                count = 0;
                 DIVenable = 1;
             end
+            
+            if(count > 50000000)
+            begin
+                count = 0;
+                state = 0;
+                trigger = 1;
+            end
+            else
+                count <= count + 1;
         end
         CONVERTING: begin
         if(divdone) begin
@@ -178,10 +199,21 @@ IntegerDivision Uno(
             D4 = tempD4;
             DIVenable4 = 0;
             timecount = 0;
-            state = 0;
-            trigger = 1;
+            state = 5;
+            
         end
         
+        
+        end
+        BUFFER: begin
+            if(count > 10000000)
+            begin
+                count = 0;
+                state = 0;
+                trigger = 1;
+            end
+            else
+                count <= count + 1;
         
         end
         endcase
