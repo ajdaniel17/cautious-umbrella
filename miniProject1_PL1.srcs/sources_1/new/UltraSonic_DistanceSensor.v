@@ -49,9 +49,9 @@ module UltraSonic_DistanceSensor(
     reg [31:0]tempdistance2;
     reg L0,L1,L2,L3,L4,L5;
     reg CorboVar0 = 1'b1;
-   
-   
-
+    
+    
+    
     
 IntegerDivision SoundToInch(
 .enable(DIVenable),
@@ -196,6 +196,9 @@ IntegerDivision Uno(
             DIVenable1 = 1;
             state = 4;
             end
+        else if(DIVenable == 0) begin
+            DIVenable = 1;
+        end
         end
         DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
         L0  = 1'b0;
