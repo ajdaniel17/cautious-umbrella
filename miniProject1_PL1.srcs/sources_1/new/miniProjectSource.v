@@ -71,6 +71,7 @@ module miniProjectSource(
     wire signed[31:0] bridge1,bridge2,bridge3;
     
     
+    
 
 
 /*assign L0  = L0 ;
@@ -81,7 +82,7 @@ assign LED4 = led4;
 assign LED5 = led5;*/
 
 UltraSonic_DistanceSensor Distance1(
-.led0 (LED0),
+.led0(LED0),
 .led1(LED1),
 .led2(LED2),
 .led3(LED3),

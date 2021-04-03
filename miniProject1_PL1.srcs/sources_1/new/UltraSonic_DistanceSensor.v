@@ -31,8 +31,7 @@ module UltraSonic_DistanceSensor(
     output reg lastecho,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
     input divdone1,divdone2,divdone3,divdone4,   
-    input [31:0] tempD1,tempD2,tempD3,tempD4,
-    output reg DIVenable = 0
+    input [31:0] tempD1,tempD2,tempD3,tempD4
     );
     
     localparam START = 0,
@@ -46,13 +45,12 @@ module UltraSonic_DistanceSensor(
     reg [31:0] count = 0;
     reg [31:0] divisorZ = 32'd1480;
     wire signed[31:0] bridge1,bridge2,bridge3;
-    reg DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
+    reg DIVenable = 0, DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
     reg [31:0]tempdistance2;
     reg L0,L1,L2,L3,L4,L5;
+    reg CorboVar0 = 1'b1;
    
    
-    
-
 
     
 IntegerDivision SoundToInch(
@@ -260,12 +258,12 @@ IntegerDivision Uno(
     
     end
     
-    assign LED0 = L0;
-    assign LED1 = L1;
-    assign LED2 = L2;
-    assign LED3 = L3;
-    assign LED4 = L4;
-    assign LED5 = L5;
+    assign led0 = L0;
+    assign led1 = L1;
+    assign led2 = L2;
+    assign led3 = L3;
+    assign led4 = L4;
+    assign led5 = L5;
     
  
 endmodule
