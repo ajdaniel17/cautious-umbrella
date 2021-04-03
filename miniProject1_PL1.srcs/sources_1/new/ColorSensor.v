@@ -171,10 +171,10 @@ IntegerDivision DivideByClear(
         FRQenable = 0;
     
         if(TEMPRED > redThresh)
-            TLED0 = 1;
+            TLED0  = 1;
 
         else
-            TLED0 = 0;
+            TLED0  = 0;
             
         if (TEMPGREEN > greenThresh)
 
@@ -197,7 +197,7 @@ IntegerDivision DivideByClear(
     
 end
 
-assign RED = TLED0;
+assign RED = TLED0 ;
 assign GREEN = TLED1;
 assign BLUE = TLED2;
 

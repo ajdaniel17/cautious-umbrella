@@ -45,7 +45,7 @@ module miniProjectSource(
     input testport,
     output a,b,c,d,e,f,
     output s0,s1,s2,s3,s4,s5,s6,dp,
-    output reg LED0,LED1,LED2,LED3,LED4,
+    output LED0,LED1,LED2,LED3,LED4,LED5,
     input colorinput,
     output colors2,colors3,
     output [3:0] an,
@@ -55,6 +55,7 @@ module miniProjectSource(
     input JB2,
     input JB3,
     input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n
+    //input L0 ,led1,led2,led3,led4,led5
 
     //input[4:0] D1,D2,D3,D4,
     //output reg [4:0] oD1,oD2,oD3,oD4
@@ -69,9 +70,23 @@ module miniProjectSource(
     reg clk2 = 0;
     wire signed[31:0] bridge1,bridge2,bridge3;
     
+    
 
+
+/*assign L0  = L0 ;
+assign LED1 = led1;
+assign LED2 = led2;
+assign LED3 = led3;
+assign LED4 = led4;
+assign LED5 = led5;*/
 
 UltraSonic_DistanceSensor Distance1(
+.led0 (LED0),
+.led1(LED1),
+.led2(LED2),
+.led3(LED3),
+.led4(LED4),
+.led5(LED5),
 .clock(clock),
 .echo(JA5),
 .trigger(JA4),
@@ -186,16 +201,4 @@ SevenSegmentDisplay SevenDisplay(
 .an(an)
 );
 
-always @ (posedge clock)
-begin
-if(tic_count > 5)
-    LED0 = 1;
-else
-    LED0 = 0;
-    
-if(tic_count < -5)
-    LED1 = 1;
-else 
-    LED1 = 0;
-end
 endmodule

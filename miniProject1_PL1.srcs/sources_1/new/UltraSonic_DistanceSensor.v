@@ -22,6 +22,7 @@
 
 module UltraSonic_DistanceSensor(
     input clock,echo,
+    output led0 ,led1,led2,led3,led4,led5,
     output reg trigger = 1,
     output reg [31:0]distance = 0,
     output reg [31:0] timecount = 0,
@@ -43,10 +44,13 @@ module UltraSonic_DistanceSensor(
     //reg DIVenable = 0;           
     reg [3:0]state = 0;
     reg [31:0] count = 0;
-    reg [31:0] divisorZ = 32'd14800;
+    reg [31:0] divisorZ = 32'd1480;
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
     reg [31:0]tempdistance2;
+    reg L0,L1,L2,L3,L4,L5;
+   
+   
     
 
 
@@ -67,8 +71,8 @@ IntegerDivision SoundToInch(
 IntegerDivision Thou(
 .enable(DIVenable1),
 .done(divdone1),
-.Dividend(tempdistance2*10),
-.Divisor(32'd1000),
+.Dividend(tempdistance2*100),
+.Divisor(32'd100000),
 .clock(clock),
 .Quotient(tempD1),
 .Remainder(bridge1),
@@ -79,7 +83,7 @@ IntegerDivision Hun(
 .enable(DIVenable2),
 .done(divdone2),
 .Dividend(bridge1),
-.Divisor(32'd100),
+.Divisor(32'd10000),
 .clock(clock),
 .Quotient(tempD2),
 .Remainder(bridge2),
@@ -90,7 +94,7 @@ IntegerDivision Ten(
 .enable(DIVenable3),
 .done(divdone3),
 .Dividend(bridge2),
-.Divisor(32'd10),
+.Divisor(32'd1000),
 .clock(clock),
 .Quotient(tempD3),
 .Remainder(bridge3),
@@ -101,7 +105,7 @@ IntegerDivision Uno(
 .enable(DIVenable4),
 .done(divdone4),
 .Dividend(bridge3),
-.Divisor(32'd1),
+.Divisor(32'd100),
 .clock(clock),
 .Quotient(tempD4),
 .Remainder(),
@@ -115,6 +119,12 @@ IntegerDivision Uno(
     begin
         case(state)
         START: begin
+        L0  = 1'b1;
+        L1 = 1'b0;
+        L2 = 1'b0;
+        L3 = 1'b0;
+        L4 = 1'b0;
+        L5 = 1'b0;
             if(count > 1000)
             begin
                 timecount = 0;
@@ -126,6 +136,12 @@ IntegerDivision Uno(
                 count <= count + 1;
         end
         WAITING: begin
+        L0  = 1'b0;
+        L1 = 1'b1;
+        L2 = 1'b0;
+        L3 = 1'b0;
+        L4 = 1'b0;
+        L5 = 1'b0;
             if (echo != lastecho) begin
                 state = 2;
                 count = 0;
@@ -141,6 +157,12 @@ IntegerDivision Uno(
                 count <= count + 1;
         end
         COUNTTIME: begin
+        L0  = 1'b0;
+        L1 = 1'b0;
+        L2 = 1'b1;
+        L3 = 1'b0;
+        L4 = 1'b0;
+        L5 = 1'b0;
             if(echo == lastecho)
             begin
                 timecount = timecount + 1;
@@ -163,6 +185,12 @@ IntegerDivision Uno(
                 count <= count + 1;
         end
         CONVERTING: begin
+        L0  = 1'b0;
+        L1 = 1'b0;
+        L2 = 1'b0;
+        L3 = 1'b1;
+        L4 = 1'b0;
+        L5 = 1'b0;
         if(divdone) begin
             distance = tempdistance;
             tempdistance2 = tempdistance;
@@ -172,7 +200,12 @@ IntegerDivision Uno(
             end
         end
         DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
-            
+        L0  = 1'b0;
+        L1 = 1'b0;
+        L2 = 1'b0;
+        L3 = 1'b0;
+        L4 = 1'b1;
+        L5 = 1'b0;
         if(divdone1)
         begin 
             D1 = tempD1;
@@ -206,6 +239,12 @@ IntegerDivision Uno(
         
         end
         BUFFER: begin
+        L0  = 1'b0;
+        L1 = 1'b0;
+        L2 = 1'b0;
+        L3 = 1'b0;
+        L4 = 1'b0;
+        L5 = 1'b1;
             if(count > 10000000)
             begin
                 count = 0;
@@ -221,7 +260,12 @@ IntegerDivision Uno(
     
     end
     
+    assign LED0 = L0;
+    assign LED1 = L1;
+    assign LED2 = L2;
+    assign LED3 = L3;
+    assign LED4 = L4;
+    assign LED5 = L5;
     
-    
-    
+ 
 endmodule
