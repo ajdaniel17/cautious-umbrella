@@ -24,7 +24,7 @@ module UltraSonic_DistanceSensor(
     input clock,echo,
     output led0 ,led1,led2,led3,led4,led5,
     output reg trigger,
-    output [31:0] distance,
+    output reg [31:0] distance,
     output reg [31:0] timecount = 32'b0,
     input [31:0] tempdistance,
     input divdone,
@@ -65,7 +65,7 @@ module UltraSonic_DistanceSensor(
     always @ (posedge clock)
     begin
     if(~enable)begin
-        //distance = 32'b0;
+        distance = 32'b0;
         done = 0;
         trigger = 0;
     end
@@ -158,7 +158,7 @@ module UltraSonic_DistanceSensor(
         L4 = 1'b0;
         L5 = 1'b0;
         if(divdone) begin
-            //distance = tempdistance;
+            distance = tempdistance;
             DIVenable = 0;
             state = 5;
             //done = 1;
