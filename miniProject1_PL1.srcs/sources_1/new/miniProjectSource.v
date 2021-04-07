@@ -43,8 +43,8 @@ module miniProjectSource(
     output PWM,
     input wire control1,control2,
     input testport,
-    output a,b,c,d,e,f,
-    output s0,s1,s2,s3,s4,s5,s6,dp,
+   // output a,b,c,d,e,f,
+    //output s0,s1,s2,s3,s4,s5,s6,dp,
     output LED0,LED1,LED2,LED3,LED4,LED5,
     input colorinput,
     output colors2,colors3,
@@ -54,7 +54,9 @@ module miniProjectSource(
     input JA5,
     input JB2,
     input JB3,
-    input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n
+    //input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n,
+    input distancedone,FourBitdone,
+    input[31:0] Distanceout
     //input L0 ,led1,led2,led3,led4,led5
 
     //input[4:0] D1,D2,D3,D4,
@@ -69,17 +71,50 @@ module miniProjectSource(
     reg counter2 = 0;
     reg clk2 = 0;
     wire signed[31:0] bridge1,bridge2,bridge3;
-    
+    //wire [31:0]Distanceout;
+    //reg [31:0] Distanceout1;
+    reg FourBitEnable;
+    reg DistanceEnable;
     
     
 
-
+/*always @ (posedge clock) begin
+    
+    if(distancedone) begin
+    Distanceout1 = Distanceout;
+    FourBitEnable = 1;
+    DistanceEnable = 0;
+    end
+    
+    if(FourBitdone) begin
+    DistanceEnable = 1;
+    FourBitEnable = 0;
+    end
+end*/
 /*assign L0  = L0 ;
 assign LED1 = led1;
 assign LED2 = led2;
 assign LED3 = led3;
 assign LED4 = led4;
 assign LED5 = led5;*/
+/*FourBitIntegerShower Magic(
+.clock(clock),
+.enable(FourBitEnable),
+.D1(D1),
+.D2(D2),
+.D3(D3),
+.D4(D4),
+.divdone1(),
+.divdone2(),
+.divdone3(),
+.divdone4(),
+.tempD1(),
+.tempD2(),
+.tempD3(),
+.tempD4(),
+.Original(Distanceout1),
+.done(FourBitdone)
+);*/
 
 UltraSonic_DistanceSensor Distance1(
 .led0(LED0),
@@ -91,22 +126,12 @@ UltraSonic_DistanceSensor Distance1(
 .clock(clock),
 .echo(JA5),
 .trigger(JA4),
-.distance(),
+.distance(Distanceout),
 .timecount(),
 .divdone(),
 .lastecho(),
-.D1(D1),
-.D2(D2),
-.D3(D3),
-.D4(D4),  
-.divdone1(),
-.divdone2(),
-.divdone3(),
-.divdone4(),   
-.tempD1(),
-.tempD2(),
-.tempD3(),
-.tempD4()
+.done(),
+.enable(DistanceEnable)
 ); 
 /*
 Distance_Sensor readDistance(
@@ -184,7 +209,7 @@ ColorSensor sensecolor(
     );*/
     
 //D4,D3,D2,D1 are what get displayed, in that order 
-SevenSegmentDisplay SevenDisplay(
+/*SevenSegmentDisplay SevenDisplay(
 .clock(clock),
 .reset(),
 .s0(s0),
@@ -200,6 +225,6 @@ SevenSegmentDisplay SevenDisplay(
 .input2(D2),
 .input3(D1),
 .an(an)
-);
+);*/
 
 endmodule
