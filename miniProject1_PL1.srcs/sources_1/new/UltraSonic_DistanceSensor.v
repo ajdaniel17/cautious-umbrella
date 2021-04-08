@@ -34,15 +34,18 @@ module UltraSonic_DistanceSensor(
     input [31:0] tempD1,tempD2,tempD3,tempD4
     );
     
-    localparam START = 0,
-               WAITING = 1,
-               COUNTTIME= 2,
-               CONVERTING = 3,
-               DISPLAY = 4,
-               BUFFER = 5;
+    localparam START = 4'd1,
+               WAITING = 4'd2,
+               COUNTTIME= 4'd3,
+               CONVERTING = 4'd4,
+               DISPLAY = 4'd5,
+               BUFFER = 4'd6;
     //reg DIVenable = 0;           
-    reg [3:0]state = 0;
+    reg [3:0]state = START;
     reg [31:0] count = 0;
+    reg [31:0] count2 = 0;
+    reg [31:0] count3 = 0;
+    reg [31:0] count4 = 0;
     reg [31:0] divisorZ = 32'd1480;
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg DIVenable = 0, DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
@@ -123,12 +126,12 @@ IntegerDivision Uno(
         L3 = 1'b0;
         L4 = 1'b0;
         L5 = 1'b0;
-            if(count > 1000)
+            if(count > 'd1000)
             begin
-                timecount = 0;
-                count = 0;
-                state = 1;
-                trigger = 0;
+                timecount <= 0;
+                count <= 0;
+                state <= WAITING;
+                trigger <= 0;
             end
             else
                 count <= count + 1;
@@ -141,18 +144,18 @@ IntegerDivision Uno(
         L4 = 1'b0;
         L5 = 1'b0;
             if (echo != lastecho) begin
-                state = 2;
-                count = 0;
+                state <= COUNTTIME;
+                //count = 0;
             end
             
-            if(count > 50000000)
+            if(count2 > 'd50000000)
             begin
-                count = 0;
-                state = 0;
-                trigger = 1;
+                count2 <= 0;
+                state <= START;
+                trigger <= 1;
             end
             else
-                count <= count + 1;
+                count2 <= count2 + 1;
         end
         COUNTTIME: begin
         L0  = 1'b0;
@@ -163,24 +166,24 @@ IntegerDivision Uno(
         L5 = 1'b0;
             if(echo == lastecho)
             begin
-                timecount = timecount + 1;
+                timecount <= timecount + 1;
             end
             else
             begin  
-                timecount = timecount + 1;
-                state = 3;
-                count = 0;
-                DIVenable = 1;
+                timecount <= timecount + 1;
+                state <= CONVERTING;
+                //count = 0;
+                DIVenable <= 1;
             end
             
-            if(count > 50000000)
+            if(count3 > 'd50000000)
             begin
-                count = 0;
-                state = 0;
-                trigger = 1;
+                count3 <= 0;
+                state <= START;
+                trigger <= 1;
             end
             else
-                count <= count + 1;
+                count3 <= count3 + 1;
         end
         CONVERTING: begin
         L0  = 1'b0;
@@ -190,14 +193,14 @@ IntegerDivision Uno(
         L4 = 1'b0;
         L5 = 1'b0;
         if(divdone) begin
-            distance = tempdistance;
-            tempdistance2 = tempdistance;
-            DIVenable = 0;
-            DIVenable1 = 1;
-            state = 4;
+            distance <= tempdistance;
+            tempdistance2 <= tempdistance;
+            DIVenable <= 0;
+            DIVenable1 <= 1;
+            state <= DISPLAY;
             end
         else if(DIVenable == 0) begin
-            DIVenable = 1;
+            DIVenable <= 1;
         end
         end
         DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
@@ -209,31 +212,31 @@ IntegerDivision Uno(
         L5 = 1'b0;
         if(divdone1)
         begin 
-            D1 = tempD1;
-            DIVenable1 = 0;
-            DIVenable2 = 1;
+            D1 <= tempD1;
+            DIVenable1 <= 0;
+            DIVenable2 <= 1;
         end
         
         if(divdone2)
         begin 
-            D2 = tempD2;
-            DIVenable2 = 0;
-            DIVenable3 = 1;
+            D2 <= tempD2;
+            DIVenable2 <= 0;
+            DIVenable3 <= 1;
         end
         
         if(divdone3)
         begin 
-            D3 = tempD3;
-            DIVenable3 = 0;
-            DIVenable4 = 1;
+            D3 <= tempD3;
+            DIVenable3 <= 0;
+            DIVenable4 <= 1;
         end
         
         if(divdone4)
         begin 
-            D4 = tempD4;
-            DIVenable4 = 0;
-            timecount = 0;
-            state = 5;
+            D4 <= tempD4;
+            DIVenable4 <= 0;
+            timecount <= 0;
+            state <= BUFFER;
             
         end
         
@@ -246,14 +249,14 @@ IntegerDivision Uno(
         L3 = 1'b0;
         L4 = 1'b0;
         L5 = 1'b1;
-            if(count > 10000000)
+            if(count4 > 'd10000000)
             begin
-                count = 0;
-                state = 0;
-                trigger = 1;
+                count4 <= 0;
+                state <= START;
+                trigger <= 1;
             end
             else
-                count <= count + 1;
+                count4 <= count4 + 1;
         
         end
         endcase

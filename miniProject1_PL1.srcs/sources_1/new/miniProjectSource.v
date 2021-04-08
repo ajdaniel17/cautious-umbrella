@@ -68,10 +68,21 @@ module miniProjectSource(
     reg counter1 = 1;
     reg counter2 = 0;
     reg clk2 = 0;
+    reg [3:0] clockCounter = 0;
     wire signed[31:0] bridge1,bridge2,bridge3;
     
     
+    always @ (posedge clock) begin
     
+     if (clockCounter > 9) begin
+      clockCounter <= 0;
+      clk2 <= ~clk2;
+     end
+     else begin
+     clockCounter <= clockCounter + 1;
+     end
+     
+    end
 
 
 /*assign L0  = L0 ;
