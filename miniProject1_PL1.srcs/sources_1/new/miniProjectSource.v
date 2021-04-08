@@ -43,8 +43,8 @@ module miniProjectSource(
     output PWM,
     input wire control1,control2,
     input testport,
-   // output a,b,c,d,e,f,
-    //output s0,s1,s2,s3,s4,s5,s6,dp,
+    output a,b,c,d,e,f,
+    output s0,s1,s2,s3,s4,s5,s6,dp,
     output LED0,LED1,LED2,LED3,LED4,LED5,
     input colorinput,
     output colors2,colors3,
@@ -54,8 +54,7 @@ module miniProjectSource(
     input JA5,
     input JB2,
     input JB3,
-    //input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n,
-    input FourBitdone
+    input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n
     //input L0 ,led1,led2,led3,led4,led5
 
     //input[4:0] D1,D2,D3,D4,
@@ -64,15 +63,15 @@ module miniProjectSource(
     //reg [4:0] tempD1,tempD2,tempD3,tempD4;
     wire [4:0]D1,D2,D3,D4;
     wire signed [15:0] tic_count;
-    
-    reg [31:0] count = 0;
+    reg [31:0] count1 = 0;
     reg [31:0] count2 = 0;
     reg counter1 = 1;
     reg counter2 = 0;
     reg clk2 = 0;
     wire signed[31:0] bridge1,bridge2,bridge3;
-    //wire [31:0]Distanceout;
-    //reg [31:0] Distanceout1;
+    
+    
+    
 
 
 /*assign L0  = L0 ;
@@ -82,30 +81,33 @@ assign LED3 = led3;
 assign LED4 = led4;
 assign LED5 = led5;*/
 
-
 UltraSonic_DistanceSensor Distance1(
-.clock(clock),
-.echo(JA5),
 .led0(LED0),
 .led1(LED1),
 .led2(LED2),
 .led3(LED3),
 .led4(LED4),
 .led5(LED5),
+.clock(clock),
+.echo(JA5),
 .trigger(JA4),
 .distance(),
 .timecount(),
-.tempdistance(),
 .divdone(),
 .lastecho(),
-.done(),
-//.start(DistanceStart),
-.D1o(D1),
-.D2o(D2),
-.D3o(D3),
-.D4o(D4)
-);
-
+.D1(D1),
+.D2(D2),
+.D3(D3),
+.D4(D4),  
+.divdone1(),
+.divdone2(),
+.divdone3(),
+.divdone4(),   
+.tempD1(),
+.tempD2(),
+.tempD3(),
+.tempD4()
+); 
 /*
 Distance_Sensor readDistance(
 .JX1(JX1),

@@ -23,37 +23,35 @@
 module UltraSonic_DistanceSensor(
     input clock,echo,
     output led0 ,led1,led2,led3,led4,led5,
-    output reg trigger,
-    output reg [31:0] distance,
-    output reg [31:0] timecount = 32'b0,
+    output reg trigger = 1,
+    output reg [31:0]distance = 0,
+    output reg [31:0] timecount = 0,
     input [31:0] tempdistance,
     input divdone,
     output reg lastecho,
-    output reg done,
-   // input start,
-    input[4:0] D1 ,D2 ,D3 ,D4,
-    input FourBitDone,
-    output[4:0] D1o,D2o,D3o,D4o
+    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
+    input divdone1,divdone2,divdone3,divdone4,   
+    input [31:0] tempD1,tempD2,tempD3,tempD4
     );
     
-    localparam
-               IDLE = 0, 
-               START = 1,
-               WAITING = 2,
-               COUNTTIME= 3,
-               CONVERTING =4,
-               DONE = 5;
+    localparam START = 0,
+               WAITING = 1,
+               COUNTTIME= 2,
+               CONVERTING = 3,
+               DISPLAY = 4,
+               BUFFER = 5;
     //reg DIVenable = 0;           
     reg [3:0]state = 0;
     reg [31:0] count = 0;
-    reg [31:0] count2 = 0;
-    reg [31:0] count3 = 0;
-    reg [31:0] divisorZ = 32'd148000;
-    reg DIVenable = 0;
+    reg [31:0] divisorZ = 32'd1480;
+    wire signed[31:0] bridge1,bridge2,bridge3;
+    reg DIVenable = 0, DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
+    reg [31:0]tempdistance2;
     reg L0,L1,L2,L3,L4,L5;
-    wire FourBitEnable;
-    reg start = 1;
-    reg i;
+    reg CorboVar0 = 1'b1;
+    
+    
+    
     
 IntegerDivision SoundToInch(
 .enable(DIVenable),
@@ -65,188 +63,210 @@ IntegerDivision SoundToInch(
 .Remainder(),
 .Percentagemode(1'b0)
 );
-    
-FourBitIntegerShower Magic(
-.clock(clock),
-.start(done),
-.D1(D1),
-.D2(D2),
-.D3(D3),
-.D4(D4),
-.tempD1(),
-.tempD2(),
-.tempD3(),
-.tempD4(),
-.Original(Distanceout),
-.done(FourBitdone)
-);
-    always @ (posedge clock)
 
-    begin 
- if(FourBitdone == 1 & ~i)
- begin
-    start = 0;
-    i = 1;
- end
- if (count2 >10000000)
-    begin
-    count2 <= 0;
-    start = 1;
-    i = 0;
-    end
-    else if (i)
-        count2 <= count2 + 1;
-    end
-    
+
+
+IntegerDivision Thou(
+.enable(DIVenable1),
+.done(divdone1),
+.Dividend(tempdistance2*100),
+.Divisor(32'd100000),
+.clock(clock),
+.Quotient(tempD1),
+.Remainder(bridge1),
+.Percentagemode(0)
+);
+
+IntegerDivision Hun(
+.enable(DIVenable2),
+.done(divdone2),
+.Dividend(bridge1),
+.Divisor(32'd10000),
+.clock(clock),
+.Quotient(tempD2),
+.Remainder(bridge2),
+.Percentagemode(0)
+);
+
+IntegerDivision Ten(
+.enable(DIVenable3),
+.done(divdone3),
+.Dividend(bridge2),
+.Divisor(32'd1000),
+.clock(clock),
+.Quotient(tempD3),
+.Remainder(bridge3),
+.Percentagemode(0)
+);
+
+IntegerDivision Uno(
+.enable(DIVenable4),
+.done(divdone4),
+.Dividend(bridge3),
+.Divisor(32'd100),
+.clock(clock),
+.Quotient(tempD4),
+.Remainder(),
+.Percentagemode(0)
+);
     always @ (posedge clock)
     lastecho <= echo;
     
     
     always @ (posedge clock)
     begin
-
         case(state)
-            IDLE: 
+        START: begin
+        L0  = 1'b1;
+        L1 = 1'b0;
+        L2 = 1'b0;
+        L3 = 1'b0;
+        L4 = 1'b0;
+        L5 = 1'b0;
+            if(count > 1000)
             begin
-            L0 = 1;
-            L1 = 0;
-            L2 = 0;
-            L3 = 0;
-            L4 = 0;
-            L5 = 0;
-                if(start) 
-                begin
-                    state = START;
-                    distance = 0;
-                    trigger = 1;
-                    timecount = 0;
-                    done = 0;
-                end
+                timecount = 0;
+                count = 0;
+                state = 1;
+                trigger = 0;
             end
-        
-            START: 
-            begin
-            L0 = 0;
-            L1 = 1;
-            L2 = 0;
-            L3 = 0;
-            L4 = 0;
-            L5 = 0;
-                if(count > 1000)
-                begin
-                    state = WAITING;
-                    count = 0;
-                    trigger = 0;
-                end
-                else
-                    count <= count + 1;
+            else
+                count <= count + 1;
+        end
+        WAITING: begin
+        L0  = 1'b0;
+        L1 = 1'b1;
+        L2 = 1'b0;
+        L3 = 1'b0;
+        L4 = 1'b0;
+        L5 = 1'b0;
+            if (echo != lastecho) begin
+                state = 2;
+                count = 0;
             end
             
-            WAITING: 
+            if(count > 50000000)
             begin
-            L0 = 0;
-            L1 = 0;
-            L2 = 1;
-            L3 = 0;
-            L4 = 0;
-            L5 = 0;
-             //   if(count > 5) begin
-                    if (echo != lastecho) begin
-                        state = COUNTTIME;
-                        count = 0;
-                    end
-                    else
-                        count <= count + 1;
-                    
-                    if(count > 10000000) begin
-                    trigger = 1;
-                    state = START;
-                    count = 0;
-                    end
-         //   end 
-                 
-//                if(count > 200000000)
-//                begin
-//                    count = 0;
-//                    state = 1;  
-//                end
-//                else
-//                    count <= count + 1;
+                count = 0;
+                state = 0;
+                trigger = 1;
             end
-            COUNTTIME: 
+            else
+                count <= count + 1;
+        end
+        COUNTTIME: begin
+        L0  = 1'b0;
+        L1 = 1'b0;
+        L2 = 1'b1;
+        L3 = 1'b0;
+        L4 = 1'b0;
+        L5 = 1'b0;
+            if(echo == lastecho)
             begin
-            L0 = 0;
-            L1 = 0;
-            L2 = 0;
-            L3 = 1;
-            L4 = 0;
-            L5 = 0;
-                if(echo == lastecho)
-                begin
-                    timecount = timecount + 1;
-                end
-                else
-                begin  
-                    timecount = timecount + 1;
-                    state = 4;
-                    DIVenable = 1;
-                end
-                
-                if(timecount > 10000000) begin
-                    trigger = 1;
-                    state = 1;
-                    timecount = 0;
-                end
-                    
-                
+                timecount = timecount + 1;
             end
-            CONVERTING: 
+            else
+            begin  
+                timecount = timecount + 1;
+                state = 3;
+                count = 0;
+                DIVenable = 1;
+            end
+            
+            if(count > 50000000)
             begin
-            L0 = 0;
-            L1 = 0;
-            L2 = 0;
-            L3 = 0;
-            L4 = 1;
-            L5 = 0;
-                if(divdone) 
-                begin
-                    distance = tempdistance;
-                    DIVenable = 0;
-                    state = DONE;
-                    done = 1;
-                end
-                else if(DIVenable == 0) 
-                begin
-                    DIVenable = 1;
-                end
+                count = 0;
+                state = 0;
+                trigger = 1;
             end
+            else
+                count <= count + 1;
+        end
+        CONVERTING: begin
+        L0  = 1'b0;
+        L1 = 1'b0;
+        L2 = 1'b0;
+        L3 = 1'b1;
+        L4 = 1'b0;
+        L5 = 1'b0;
+        if(divdone) begin
+            distance = tempdistance;
+            tempdistance2 = tempdistance;
+            DIVenable = 0;
+            DIVenable1 = 1;
+            state = 4;
+            end
+        else if(DIVenable == 0) begin
+            DIVenable = 1;
+        end
+        end
+        DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
+        L0  = 1'b0;
+        L1 = 1'b0;
+        L2 = 1'b0;
+        L3 = 1'b0;
+        L4 = 1'b1;
+        L5 = 1'b0;
+        if(divdone1)
+        begin 
+            D1 = tempD1;
+            DIVenable1 = 0;
+            DIVenable2 = 1;
+        end
         
-            DONE: 
+        if(divdone2)
+        begin 
+            D2 = tempD2;
+            DIVenable2 = 0;
+            DIVenable3 = 1;
+        end
+        
+        if(divdone3)
+        begin 
+            D3 = tempD3;
+            DIVenable3 = 0;
+            DIVenable4 = 1;
+        end
+        
+        if(divdone4)
+        begin 
+            D4 = tempD4;
+            DIVenable4 = 0;
+            timecount = 0;
+            state = 5;
+            
+        end
+        
+        
+        end
+        BUFFER: begin
+        L0  = 1'b0;
+        L1 = 1'b0;
+        L2 = 1'b0;
+        L3 = 1'b0;
+        L4 = 1'b0;
+        L5 = 1'b1;
+            if(count > 10000000)
             begin
-            L0 = 0;
-            L1 = 0;
-            L2 = 0;
-            L3 = 0;
-            L4 = 0;
-            L5 = 1;
-                if(~start)
-                begin
-                    state = IDLE;
-                end
+                count = 0;
+                state = 0;
+                trigger = 1;
             end
-    endcase
-end
+            else
+                count <= count + 1;
+        
+        end
+        endcase
+        
     
+    end
     
-assign led0 = L0;
-assign led1 = L1;
-assign led2 = L2;
-assign led3 = L3;
-assign led4 = L4;
-assign led5 = L5;
-
-assign D1o = D1;
-assign D2o = D2;
-assign D3o = D3;
-assign D4o = D4;
+    assign led0 = L0;
+    assign led1 = L1;
+    assign led2 = L2;
+    assign led3 = L3;
+    assign led4 = L4;
+    assign led5 = L5;
+    
+ 
 endmodule
