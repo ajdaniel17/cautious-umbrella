@@ -21,17 +21,21 @@
 
 
 module FourBitIntegerShower(
-    input clock,enable,
-    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
-    input divdone1,divdone2,divdone3,divdone4,   
+    input clock,start,
+    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,  
     input [31:0] tempD1,tempD2,tempD3,tempD4,
     input [31:0] Original,
-    output done
+    output reg done = 0,
+    input divdone1,divdone2,divdone3,divdone4
     );
-    
-    wire signed[31:0] bridge1,bridge2,bridge3;
+    wire[31:0] bridge1,bridge2,bridge3;
     reg DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
-    
+    localparam
+               IDLE = 0, 
+               SHOWING = 1,
+               DONE = 2;
+    //reg DIVenable = 0;           
+    reg [3:0]state = 0;
     
 IntegerDivision Thou(
 .enable(DIVenable1),
@@ -78,34 +82,58 @@ IntegerDivision Uno(
 );
 
 always @ (posedge clock) begin
-
-    if(divdone1)
+    case (state)
+        IDLE:
         begin 
-            D1 = tempD1;
-            DIVenable1 = 0;
-            DIVenable2 = 1;
+        if(start)
+        begin
+           state = SHOWING;
+           DIVenable1 = 1;
+           done = 0;
+        end
         end
         
-        if(divdone2)
-        begin 
-            D2 = tempD2;
-            DIVenable2 = 0;
-            DIVenable3 = 1;
+        SHOWING: 
+        begin
+            if(divdone1)
+            begin 
+                D1 = tempD1;
+                DIVenable1 = 0;
+                DIVenable2 = 1;
+            end
+            
+            if(divdone2)
+            begin 
+                D2 = tempD2;
+                DIVenable2 = 0;
+                DIVenable3 = 1;
+            end
+            
+            if(divdone3)
+            begin 
+                D3 = tempD3;
+                DIVenable3 = 0;
+                DIVenable4 = 1;
+            end
+            
+            if(divdone4)
+            begin 
+                D4 = tempD4;
+                DIVenable4 = 0;
+                done = 1;
+                state = DONE;
+            end
         end
+        DONE:
+        begin
+            if(~start)
+                state = IDLE;
+        end
+    endcase
         
-        if(divdone3)
-        begin 
-            D3 = tempD3;
-            DIVenable3 = 0;
-            DIVenable4 = 1;
-        end
         
-        if(divdone4)
-        begin 
-            D4 = tempD4;
-            DIVenable4 = 0;
-        end
    
+       
 end
     
 endmodule
