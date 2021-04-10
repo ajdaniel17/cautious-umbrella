@@ -22,7 +22,7 @@
 
 module UltraSonic_DistanceSensor(
     input clock,echo,
-    output led0 ,led1,led2,led3,led4,led5,
+    output led0 ,led1,led2,led3,led4,led5,led12,led13,led14,led15,
     output reg trigger = 1,
     output reg [31:0]distance = 0,
     output reg [31:0] timecount = 0,
@@ -50,7 +50,7 @@ module UltraSonic_DistanceSensor(
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg DIVenable = 0, DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
     reg [31:0]tempdistance2;
-    reg L0,L1,L2,L3,L4,L5;
+    reg L0,L1,L2,L3,L4,L5,L12,L13,L14,L15;
     reg CorboVar0 = 1'b1;
     
     
@@ -145,10 +145,10 @@ IntegerDivision Uno(
         L5 = 1'b0;
             if (echo != lastecho) begin
                 state <= COUNTTIME;
-                //count = 0;
+                count2 <= 0;
             end
             
-            if(count2 > 'd50000000)
+            if(count2 > 'd100000)
             begin
                 count2 <= 0;
                 state <= START;
@@ -158,7 +158,7 @@ IntegerDivision Uno(
                 count2 <= count2 + 1;
         end
         COUNTTIME: begin
-        L0  = 1'b0;
+        L0 = 1'b0;
         L1 = 1'b0;
         L2 = 1'b1;
         L3 = 1'b0;
@@ -172,13 +172,14 @@ IntegerDivision Uno(
             begin  
                 timecount <= timecount + 1;
                 state <= CONVERTING;
-                //count = 0;
+                count3 <= 0;
                 DIVenable <= 1;
             end
             
-            if(count3 > 'd50000000)
+            if(count3 > 'd25000000)
             begin
                 count3 <= 0;
+                timecount <= 0;
                 state <= START;
                 trigger <= 1;
             end
@@ -196,12 +197,12 @@ IntegerDivision Uno(
             distance <= tempdistance;
             tempdistance2 <= tempdistance;
             DIVenable <= 0;
-            DIVenable1 <= 1;
+            DIVenable1 <= 1;            
             state <= DISPLAY;
             end
-        else if(DIVenable == 0) begin
+        /*else if(DIVenable == 0) begin
             DIVenable <= 1;
-        end
+        end*/
         end
         DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
         L0  = 1'b0;
@@ -210,8 +211,16 @@ IntegerDivision Uno(
         L3 = 1'b0;
         L4 = 1'b1;
         L5 = 1'b0;
+        L12 = 1'b0;
+        L13 = 1'b0;
+        L14 = 1'b0;
+        L15 = 1'b0;
         if(divdone1)
         begin 
+            L12 = 1'b1;
+            L13 = 1'b0;
+            L14 = 1'b0;
+            L15 = 1'b0;
             D1 <= tempD1;
             DIVenable1 <= 0;
             DIVenable2 <= 1;
@@ -219,6 +228,10 @@ IntegerDivision Uno(
         
         if(divdone2)
         begin 
+            L12 = 1'b0;
+            L13 = 1'b1;
+            L14 = 1'b0;
+            L15 = 1'b0;
             D2 <= tempD2;
             DIVenable2 <= 0;
             DIVenable3 <= 1;
@@ -226,6 +239,10 @@ IntegerDivision Uno(
         
         if(divdone3)
         begin 
+            L12 = 1'b0;
+            L13 = 1'b0;
+            L14 = 1'b1;
+            L15 = 1'b0;
             D3 <= tempD3;
             DIVenable3 <= 0;
             DIVenable4 <= 1;
@@ -233,11 +250,14 @@ IntegerDivision Uno(
         
         if(divdone4)
         begin 
+            L12 = 1'b0;
+            L13 = 1'b0;
+            L14 = 1'b0;
+            L15 = 1'b1;
             D4 <= tempD4;
             DIVenable4 <= 0;
             timecount <= 0;
             state <= BUFFER;
-            
         end
         
         
@@ -249,9 +269,14 @@ IntegerDivision Uno(
         L3 = 1'b0;
         L4 = 1'b0;
         L5 = 1'b1;
+        L12 = 1'b1;
+        L13 = 1'b1;
+        L14 = 1'b1;
+        L15 = 1'b1;
             if(count4 > 'd10000000)
             begin
                 count4 <= 0;
+                
                 state <= START;
                 trigger <= 1;
             end
@@ -270,6 +295,10 @@ IntegerDivision Uno(
     assign led3 = L3;
     assign led4 = L4;
     assign led5 = L5;
+    assign led12 = L12;
+    assign led13 = L13;
+    assign led14 = L14;
+    assign led15 = L15;
     
  
 endmodule

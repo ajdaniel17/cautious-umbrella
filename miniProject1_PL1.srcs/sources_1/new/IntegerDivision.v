@@ -41,32 +41,32 @@ module IntegerDivision(
             
         if(~enable)
         begin
-            done = 0;
-            Quotient = 0;
-            Remainder = 0;
+            done <= 0;
+            Quotient <= 0;
+            Remainder <= 0;
             if(Percentagemode)
                 if(Dividend > $signed(32'd0))
-                tempvar = Dividend*100;
+                tempvar <= Dividend*100;
                 else
-                tempvar = Dividend*-100;
+                tempvar <= Dividend*-100;
             else 
                 if(Dividend > $signed(32'd0))
-                tempvar = Dividend;
+                tempvar <= Dividend;
                 else
-                tempvar = Dividend*-1;
+                tempvar <= Dividend*-1;
 
         end
         else
         begin
                 if(tempvar >= Divisor)
                 begin
-                    Quotient = Quotient + 1;
-                    tempvar = tempvar - Divisor;
+                    Quotient <= Quotient + 1;
+                    tempvar <= tempvar - Divisor;
                 end
                 else
                 begin
-                    Remainder = tempvar;
-                    done = 1;
+                    Remainder <= tempvar;
+                    done <= 1;
                 end
             
         end

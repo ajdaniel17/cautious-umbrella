@@ -48,26 +48,26 @@ always @ (*)
    
    2'b00 :  //When the 2 MSB's are 00 enable the fourth display
     begin
-     sseg = input0;
-     an_temp = 4'b1110;
+     sseg <= input0;
+     an_temp <= 4'b1110;
     end
    
    2'b01:  //When the 2 MSB's are 01 enable the third display
     begin
-     sseg = input1;
-     an_temp = 4'b1101;
+     sseg <= input1;
+     an_temp <= 4'b1101;
     end
    
    2'b10:  //When the 2 MSB's are 10 enable the second display
     begin
-     sseg = input2;
-     an_temp = 4'b1011;
+     sseg <= input2;
+     an_temp <= 4'b1011;
     end
     
    2'b11:  //When the 2 MSB's are 11 enable the first display
     begin
-     sseg = input3;
-     an_temp = 4'b0111;
+     sseg <= input3;
+     an_temp <= 4'b0111;
     end
   endcase
  end
@@ -79,24 +79,24 @@ reg [6:0] sseg_temp; // 7 bit register to hold the binary value of each input gi
 always @ (*)
  begin
   case(sseg)
-   4'd0 : sseg_temp = 7'b1000000; //to display 0
-   4'd1 : sseg_temp = 7'b1111001; //to display 1
-   4'd2 : sseg_temp = 7'b0100100; //to display 2
-   4'd3 : sseg_temp = 7'b0110000; //to display 3
-   4'd4 : sseg_temp = 7'b0011001; //to display 4
-   4'd5 : sseg_temp = 7'b0010010; //to display 5
-   4'd6 : sseg_temp = 7'b0000010; //to display 6
-   4'd7 : sseg_temp = 7'b1111000; //to display 7
-   4'd8 : sseg_temp = 7'b0000000; //to display 8
-   4'd9 : sseg_temp = 7'b0010000; //to display 9
-   4'd10 : sseg_temp = 7'b0001000; //to display A
-   4'd11 : sseg_temp = 7'b0000011; //to display b
-   4'd12 : sseg_temp = 7'b1000110; //to display C
-   4'd13 : sseg_temp = 7'b0100001; //to display d
-   4'd14 : sseg_temp = 7'b0000110; //to display E
-   4'd15 : sseg_temp = 7'b0001110; //to display F
+   4'd0 : sseg_temp <= 7'b1000000; //to display 0
+   4'd1 : sseg_temp <= 7'b1111001; //to display 1
+   4'd2 : sseg_temp <= 7'b0100100; //to display 2
+   4'd3 : sseg_temp <= 7'b0110000; //to display 3
+   4'd4 : sseg_temp <= 7'b0011001; //to display 4
+   4'd5 : sseg_temp <= 7'b0010010; //to display 5
+   4'd6 : sseg_temp <= 7'b0000010; //to display 6
+   4'd7 : sseg_temp <= 7'b1111000; //to display 7
+   4'd8 : sseg_temp <= 7'b0000000; //to display 8
+   4'd9 : sseg_temp <= 7'b0010000; //to display 9
+   4'd10 : sseg_temp <= 7'b0001000; //to display A
+   4'd11 : sseg_temp <= 7'b0000011; //to display b
+   4'd12 : sseg_temp <= 7'b1000110; //to display C
+   4'd13 : sseg_temp <= 7'b0100001; //to display d
+   4'd14 : sseg_temp <= 7'b0000110; //to display E
+   4'd15 : sseg_temp <= 7'b0001110; //to display F
    
-   default : sseg_temp = 7'b0111111; //dash
+   default : sseg_temp <= 7'b0111111; //dash
   endcase
  end
 assign {s6, s5, s4, s3, s2, s1, s0} = sseg_temp; //concatenate the outputs to the register, this is just a more neat way of doing this.
