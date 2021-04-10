@@ -30,6 +30,7 @@ module SevenSegmentDisplay(
 localparam N = 18;
 
 reg [N-1:0]count; //the 18 bit counter which allows us to multiplex at 1000Hz
+reg dudePerfect;
 
 always @ (posedge clock or posedge reset)
  begin
@@ -50,24 +51,28 @@ always @ (*)
     begin
      sseg <= input0;
      an_temp <= 4'b1110;
+     dudePerfect <= 1;
     end
    
    2'b01:  //When the 2 MSB's are 01 enable the third display
     begin
      sseg <= input1;
      an_temp <= 4'b1101;
+     dudePerfect <= 0;
     end
    
    2'b10:  //When the 2 MSB's are 10 enable the second display
     begin
      sseg <= input2;
      an_temp <= 4'b1011;
+     dudePerfect <= 1;
     end
     
    2'b11:  //When the 2 MSB's are 11 enable the first display
     begin
      sseg <= input3;
      an_temp <= 4'b0111;
+     dudePerfect <= 1;
     end
   endcase
  end
@@ -99,10 +104,13 @@ always @ (*)
    default : sseg_temp <= 7'b0111111; //dash
   endcase
  end
+ 
+
 assign {s6, s5, s4, s3, s2, s1, s0} = sseg_temp; //concatenate the outputs to the register, this is just a more neat way of doing this.
+
 // I could have done in the case statement: 4'd0 : {g, f, e, d, c, b, a} = 7'b1000000; 
 // its the same thing.. write however you like it
 
-assign dp = 1'b1; //since the decimal point is not needed, all 4 of them are turned off
+assign dp = dudePerfect; //since the decimal point is not needed, all 4 of them are turned off
 
 endmodule
