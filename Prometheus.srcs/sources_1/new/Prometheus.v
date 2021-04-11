@@ -45,7 +45,7 @@ module Prometheus(
     input testport,
     output a,b,c,d,e,f,
     output s0,s1,s2,s3,s4,s5,s6,dp,
-    output LED0,LED1,LED2,LED3,LED4,LED5,
+    output LED0,LED1,LED2,LED3,LED4,LED5,LED12,
     //LED12,LED13,LED14,LED15,
     input colorinput,
     output colors2,colors3,
@@ -101,7 +101,7 @@ UltraSonic_DistanceSensor Distance1(
 .led4(LED4),
 .led5(LED5),
 .btnU(btnU),
-/*.led12(LED12),
+.led12(LED12),/*
 .led13(LED13),
 .led14(LED14),
 .led15(LED15),*/
