@@ -96,7 +96,22 @@ Search_Algorithm Brain(
 .in3(JC5),
 .in4(JC6),
 .enA(JC1),
-.enB(JC2)
+.enB(JC2),
+.D1(),
+.D2(),
+.D3(),
+.D4(),
+.D1o(D1),
+.D2o(D2),
+.D3o(D3),
+.D4o(D4),
+.LED0(LED0),
+.LED1(LED1),
+.LED2(LED2),
+.LED3(LED3),
+.LED4(LED4),
+.LED5(LED5),
+.LED12(LED12)
 );
 
 /*assign L0  = L0 ;
