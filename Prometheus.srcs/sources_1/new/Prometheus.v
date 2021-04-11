@@ -43,7 +43,7 @@ module Prometheus(
     output PWM,
     input wire control1,control2,
     input testport,
-    output a,b,c,d,e,f,
+    output JC1,JC2,JC3,JC4,JC5,JC6,
     output s0,s1,s2,s3,s4,s5,s6,dp,
     output LED0,LED1,LED2,LED3,LED4,LED5,LED12,
     //LED12,LED13,LED14,LED15,
@@ -86,6 +86,19 @@ module Prometheus(
     end
 
 
+Search_Algorithm Brain(
+.clock(clock),
+.JA5(JA5),
+.JA4(JA4),
+.Distance1(),
+.in1(JC3),
+.in2(JC4),
+.in3(JC5),
+.in4(JC6),
+.enA(JC1),
+.enB(JC2)
+);
+
 /*assign L0  = L0 ;
 assign LED1 = led1;
 assign LED2 = led2;
@@ -93,38 +106,6 @@ assign LED3 = led3;
 assign LED4 = led4;
 assign LED5 = led5;*/
 
-UltraSonic_DistanceSensor Distance1(
-.led0(LED0),
-.led1(LED1),
-.led2(LED2),
-.led3(LED3),
-.led4(LED4),
-.led5(LED5),
-.btnU(btnU),
-.led12(LED12),/*
-.led13(LED13),
-.led14(LED14),
-.led15(LED15),*/
-.clock(clock),
-.echo(JA5),
-.trigger(JA4),
-.distance(),
-.timecount(),
-.divdone(),
-.lastecho(),
-.D1(D1),
-.D2(D2),
-.D3(D3),
-.D4(D4),  
-.divdone1(),
-.divdone2(),
-.divdone3(),
-.divdone4(),   
-.tempD1(),
-.tempD2(),
-.tempD3(),
-.tempD4()
-); 
 /*
 Distance_Sensor readDistance(
 .JX1(JX1),
