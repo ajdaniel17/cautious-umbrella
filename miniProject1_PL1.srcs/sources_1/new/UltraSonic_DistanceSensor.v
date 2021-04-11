@@ -24,7 +24,7 @@ module UltraSonic_DistanceSensor(
     input clock,echo,
     input btnU,
     output led0 ,led1,led2,led3,led4,led5,
-    output reg trigger = 1,
+    output reg trigger = 0,
     output reg [31:0]distance = 0,
     output reg [31:0] timecount = 0,
     input [31:0] tempdistance,
@@ -40,13 +40,15 @@ module UltraSonic_DistanceSensor(
                COUNTTIME= 4'd3,
                CONVERTING = 4'd4,
                DISPLAY = 4'd5,
-               BUFFER = 4'd6;
+               BUFFER = 4'd6,
+               SIXTYHZ = 4'd7;
     //reg DIVenable = 0;           
-    reg [3:0]state = START;
+    reg [3:0]state = BUFFER;
     reg [31:0] count = 0;
     reg [31:0] count2 = 0;
     reg [31:0] count3 = 0;
     reg [31:0] count4 = 0;
+    reg [31:0] count5 = 0;
     reg [31:0] divisorZ = 32'd1480;
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg DIVenable = 0, DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
@@ -150,15 +152,15 @@ IntegerDivision Uno(
             if (echo != lastecho) begin
                 state <= COUNTTIME;
                 count2 <= 0;
-                count3 <= 0;
+                count3 <= 0; 
             end
             
-            if(count2 > 32'd25000)
+            if(count2 > 32'd50000)
             begin
                 count <= 0;
                 count2 <= 0;
-                state <= START;
-                trigger <= 1;
+                state <= SIXTYHZ;
+                //trigger <= 1;
             end
             count2 <= count2 + 1;
         end
@@ -185,8 +187,8 @@ IntegerDivision Uno(
             begin
                 count <=0;
                 count3 <= 0;
-                state <= START;
-                trigger <= 1;
+                state <= SIXTYHZ;
+                //trigger <= 1;
             end
             
             count3 <= count3 + 1;
@@ -276,6 +278,17 @@ IntegerDivision Uno(
             end
         
         end
+        
+        SIXTYHZ: begin
+            if(count5 > 32'd1666666) begin
+                count5 <= 0;
+                state <= START;
+                trigger <= 1;
+            end
+            else
+                count5 <= count5 + 1;
+        end
+        
         endcase
         
     
