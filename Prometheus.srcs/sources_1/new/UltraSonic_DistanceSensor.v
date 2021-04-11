@@ -319,7 +319,7 @@ IntegerDivision Uno(
             btnChange = 1;
             
             if(btnChange) begin
-                if(count4 > 32'd1666666) begin
+                if(count4 > 32'd10000000) begin
                     //count <= 0;
                     //count2 <= 0;
                     //count3 <= 0;

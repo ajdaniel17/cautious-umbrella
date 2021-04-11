@@ -32,11 +32,13 @@ module Search_Algorithm(
  
     reg [21:0] counter = 0;
     reg [31:0] counter2 = 0;
+    reg [31:0] counter3 = 0;
     reg [21:0] width = 450000;
     reg temp_PWM = 0;
     reg Distance1ENA = 0;
     reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
+    reg [31:0] target = 300;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -111,30 +113,39 @@ always @ (posedge clock) begin
         counter2 <= counter2 + 1;
        end           
        
+       //if (counter3 > 10000000) begin
        if (Distance1 == 0 || ANGRYFLAG == 1) begin
+        counter3 = 0;
         enA = 0;
         enB = 0;
        end
-       else if(Distance1 < 695) begin
-       in1 = 1;
-       in2 = 0;
-       in3 = 0;
-       in4 = 1;
-       enA = temp_PWM;
-       enB = temp_PWM;
-       end
-      else if (Distance1 > 705) begin
+       else if(Distance1 < (target-5)) begin
+       counter3 = 0;
        in1 = 0;
        in2 = 1;
        in3 = 1;
        in4 = 0;
        enA = temp_PWM;
        enB = temp_PWM;
+       end
+      else if (Distance1 > (target+5)) begin
+       counter3 = 0;
+       in1 = 1;
+       in2 = 0;
+       in3 = 0;
+       in4 = 1;
+       enA = temp_PWM;
+       enB = temp_PWM;
       end
       else begin
+      counter3 = 0;
       enA = 0;
       enB = 0;
       end
+      //end
+      //else begin 
+      //  counter3 = counter3 + 1;
+      //end
 end
 
 assign D1o = D1;
