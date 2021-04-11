@@ -49,6 +49,7 @@ module UltraSonic_DistanceSensor(
     reg [31:0] count3 = 0;
     reg [31:0] count4 = 0;
     reg [31:0] count5 = 0;
+    reg [31:0] count6 = 0;
     reg [31:0] divisorZ = 32'd1480;
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg DIVenable = 0, DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
@@ -203,14 +204,22 @@ IntegerDivision Uno(
         if(divdone) begin
             distance <= tempdistance;
             tempdistance2 <= tempdistance;
-            DIVenable <= 0;
-            DIVenable1 <= 1;
-            state <= DISPLAY;
+            
+            if(count6 > 32'd2) begin
+              count6 <= 0;
+              DIVenable <= 0;
+              DIVenable1 <= 1;
+              state <= DISPLAY;
             end
+            else
+              count6 <= count6 + 1;
+            end
+            
         else if(DIVenable == 0) begin
             DIVenable <= 1;
         end
         end
+        
         DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
         L0  = 1'b0;
         L1 = 1'b0;
@@ -219,7 +228,8 @@ IntegerDivision Uno(
         L4 = 1'b1;
         L5 = 1'b0;
         if(divdone1)
-        begin 
+        begin
+            
             D1 <= tempD1;
             DIVenable1 <= 0;
             DIVenable2 <= 1;
@@ -290,7 +300,6 @@ IntegerDivision Uno(
         end
         
         endcase
-        
     
     end
     
