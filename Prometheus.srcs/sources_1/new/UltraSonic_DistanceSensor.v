@@ -44,6 +44,7 @@ module UltraSonic_DistanceSensor(
                SIXTYHZ = 4'd7;
     //reg DIVenable = 0;           
     reg [3:0]state = BUFFER;
+    reg [3:0]lastState;
     reg [31:0] count = 0;
     reg [31:0] count2 = 0;
     reg [31:0] count3 = 0;
@@ -51,11 +52,13 @@ module UltraSonic_DistanceSensor(
     reg [31:0] count5 = 0;
     reg [31:0] count6 = 0;
     reg [31:0] plzWait = 0;
+    reg [31:0] stateCounter = 0;
     reg [31:0] divisorZ = 32'd1480;
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg DIVenable = 0, DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
     reg [31:0]tempdistance2;
-    reg L0,L1,L2,L3,L4,L5,L12;
+    reg L0,L1,L2,L3,L4,L5;
+    reg L12 = 0;
     reg CorboVar0 = 1'b1;
     reg btnChange = 0;
     
@@ -118,12 +121,28 @@ IntegerDivision Uno(
 .Remainder(),
 .Percentagemode(0)
 );
-    always @ (posedge clock)
+    always @ (posedge clock) begin
     lastecho <= echo;
-    
+    lastState <= state;
+    end
     
     always @ (posedge clock)
     begin
+        if (lastState == state & state != BUFFER) begin
+            stateCounter <= stateCounter + 1;
+        end
+        else if (lastState != state) begin
+            stateCounter <= 0;
+        end
+        if (stateCounter > 2000000) begin
+            L12 <= 1;
+            state <= SIXTYHZ;
+            count <= 0;
+            count2 <= 0;
+            count3 <= 0;
+        end
+            
+        
         case(state)
         START: begin
         L0  = 1'b1;
@@ -196,12 +215,11 @@ IntegerDivision Uno(
                 //count3 <= count3 + 1;
                 timecount <= timecount + 1;
             end
-            else
+            if(echo != lastecho)
             begin  
                 plzWait = 0;
                 timecount <= timecount + 1;
                 state <= CONVERTING;
-                count3 <= 0;
                 DIVenable <= 1;
             end
             
@@ -218,6 +236,7 @@ IntegerDivision Uno(
             plzWait = plzWait + 1;  
         end
         CONVERTING: begin
+        count3 <= 0;
         L0  = 1'b0;
         L1 = 1'b0;
         L2 = 1'b0;
@@ -229,7 +248,6 @@ IntegerDivision Uno(
             tempdistance2 <= tempdistance;
             
             if(count6 > 32'd2) begin
-              count6 <= 0;
               DIVenable <= 0;
               DIVenable1 <= 1;
               state <= DISPLAY;
@@ -244,6 +262,7 @@ IntegerDivision Uno(
         end
         
         DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
+        count6 <= 0;
         L0  = 1'b0;
         L1 = 1'b0;
         L2 = 1'b0;

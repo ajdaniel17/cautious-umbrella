@@ -35,6 +35,8 @@ module Search_Algorithm(
     reg [21:0] width = 450000;
     reg temp_PWM = 0;
     reg Distance1ENA = 0;
+    reg [31:0]lastDistance = 0;
+    reg ANGRYFLAG = 0;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -42,6 +44,7 @@ module Search_Algorithm(
     assign LED3 = led3;
     assign LED4 = led4;
     assign LED5 = led5;
+    assign LED12 = led12;
     
 UltraSonic_DistanceSensor FindDistance1(
 .led0(led0),
@@ -78,12 +81,21 @@ UltraSonic_DistanceSensor FindDistance1(
 ); 
 
 always @ (posedge clock) begin
+    lastDistance <= Distance1;
+end
+
+always @ (posedge clock) begin
 
         if (counter > 1666666)
             counter <= 0;
         else
             counter <= counter +1;
             
+        if(lastDistance > (Distance1+50) || lastDistance < (Distance1 - 50)) begin
+        ANGRYFLAG = 1;
+        end
+        else 
+            ANGRYFLAG = 0;
         
         if(counter < width)
            temp_PWM <= 1;
@@ -99,11 +111,11 @@ always @ (posedge clock) begin
         counter2 <= counter2 + 1;
        end           
        
-       if (Distance1 == 0) begin
-      enA = 0;
-      enB = 0;;
+       if (Distance1 == 0 || ANGRYFLAG == 1) begin
+        enA = 0;
+        enB = 0;
        end
-       else if(Distance1 < 297) begin
+       else if(Distance1 < 695) begin
        in1 = 1;
        in2 = 0;
        in3 = 0;
@@ -111,7 +123,7 @@ always @ (posedge clock) begin
        enA = temp_PWM;
        enB = temp_PWM;
        end
-      else if (Distance1 > 303) begin
+      else if (Distance1 > 705) begin
        in1 = 0;
        in2 = 1;
        in3 = 1;
