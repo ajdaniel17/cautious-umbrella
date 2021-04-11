@@ -23,7 +23,7 @@
 module UltraSonic_DistanceSensor(
     input clock,echo,
     input btnU,
-    output led0 ,led1,led2,led3,led4,led5,led12,
+    output led0 ,led1,led2,led3,led4,led5,
     output reg trigger = 0,
     output reg [31:0]distance = 0,
     output reg [31:0] timecount = 0,
@@ -54,7 +54,7 @@ module UltraSonic_DistanceSensor(
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg DIVenable = 0, DIVenable1 = 0,DIVenable2 = 0,DIVenable3 = 0,DIVenable4 = 0;
     reg [31:0]tempdistance2;
-    reg L0,L1,L2,L3,L4,L5,L12;
+    reg L0,L1,L2,L3,L4,L5;
     reg CorboVar0 = 1'b1;
     reg btnChange = 0;
     
@@ -151,13 +151,12 @@ IntegerDivision Uno(
         L4 = 1'b0;
         L5 = 1'b0;
             if (echo != lastecho) begin
-                //count2 <= count2 + 1;
                 state <= COUNTTIME;
                 count2 <= 0;
                 count3 <= 0; 
             end
             
-            if(count2 >= 32'd50000)
+            if(count2 > 32'd50000)
             begin
                 count <= 0;
                 count2 <= 0;
@@ -173,12 +172,8 @@ IntegerDivision Uno(
         L3 = 1'b0;
         L4 = 1'b0;
         L5 = 1'b0;
-        
-        count3 <= count3 + 1;
-        
             if(echo == lastecho)
             begin
-                //count3 <= count3 + 1;
                 timecount <= timecount + 1;
             end
             else
@@ -189,14 +184,15 @@ IntegerDivision Uno(
                 DIVenable <= 1;
             end
             
-            if(count3 >= 32'd6000000)
+            if(count3 > 32'd3000000)
             begin
                 count <=0;
                 count3 <= 0;
                 state <= SIXTYHZ;
                 //trigger <= 1;
-            end        
+            end
             
+            count3 <= count3 + 1;
         end
         CONVERTING: begin
         L0  = 1'b0;
@@ -281,7 +277,7 @@ IntegerDivision Uno(
             btnChange = 1;
             
             if(btnChange) begin
-                if(count4 > 32'd50000000) begin
+                if(count4 > 'd50000000) begin
                     count4 <= 0;
                     btnChange <= 0;
                     state <= START;
@@ -294,9 +290,7 @@ IntegerDivision Uno(
         end
         
         SIXTYHZ: begin
-            L12 = 1;
             if(count5 > 32'd1666666) begin
-                L12 = 0;
                 count5 <= 0;
                 state <= START;
                 trigger <= 1;
@@ -315,6 +309,6 @@ IntegerDivision Uno(
     assign led3 = L3;
     assign led4 = L4;
     assign led5 = L5;
-    assign led12 = L12;
+    
  
 endmodule
