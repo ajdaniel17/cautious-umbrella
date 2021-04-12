@@ -27,18 +27,20 @@ module Search_Algorithm(
     input led0,led1,led2,led3,led4,led5,led12,
     output LED0, LED1, LED2, LED3, LED4, LED5, LED12,
     input [4:0] D1,D2,D3,D4,
-    output[4:0] D1o,D2o,D3o,D4o
+    output[4:0] D1o,D2o,D3o,D4o,
+    input distanceDone
     );
  
     reg [21:0] counter = 0;
     reg [31:0] counter2 = 0;
     reg [31:0] counter3 = 0;
-    reg [21:0] width = 450000;
+    reg [31:0] width;
     reg temp_PWM = 0;
     reg Distance1ENA = 0;
     reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
     reg [31:0] target = 300;
+    reg [31:0] trueDistance = 0;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -79,8 +81,14 @@ UltraSonic_DistanceSensor FindDistance1(
 .tempD1(),
 .tempD2(),
 .tempD3(),
-.tempD4()
+.tempD4(),
+.done(distanceDone)
 ); 
+
+always @ (posedge clock) begin
+if(distanceDone)
+    trueDistance = Distance1;
+end
 
 always @ (posedge clock) begin
     lastDistance <= Distance1;
@@ -88,38 +96,50 @@ end
 
 always @ (posedge clock) begin
 
+
+        if(trueDistance  > (target+200) || trueDistance  < (target- 200)) begin
+        width <= 866666;
+        end
+        else if ((trueDistance < (target+50)) & (trueDistance > (target-50))) begin
+        width <= 250000;
+        
+        end
+        else if ((trueDistance < (target+100)) & (trueDistance > (target-100))) begin
+        width <= 500000;
+        end
+        
         if (counter > 1666666)
             counter <= 0;
         else
             counter <= counter +1;
             
-        if(lastDistance > (Distance1+50) || lastDistance < (Distance1 - 50)) begin
-        ANGRYFLAG = 1;
+        if((Distance1>(trueDistance+50)) || (Distance1<(trueDistance - 50))) begin
+        ANGRYFLAG <= 1;
         end
         else 
-            ANGRYFLAG = 0;
+            ANGRYFLAG <= 0;
         
         if(counter < width)
            temp_PWM <= 1;
         else 
            temp_PWM <= 0;   
        
-       if (counter2 > 10000000) begin
+       if (counter2 > 1000000) begin
         Distance1ENA <= 1;
         counter2 <= 0;
        end
-       else begin
+       else if (distanceDone)begin
          Distance1ENA <= 0;
         counter2 <= counter2 + 1;
        end           
        
        //if (counter3 > 10000000) begin
-       if (Distance1 == 0 || ANGRYFLAG == 1) begin
+       if (trueDistance < 50 || ANGRYFLAG == 1) begin
         counter3 = 0;
         enA = 0;
         enB = 0;
        end
-       else if(Distance1 < (target-5)) begin
+       else if(trueDistance < (target-10)) begin
        counter3 = 0;
        in1 = 0;
        in2 = 1;
@@ -128,7 +148,7 @@ always @ (posedge clock) begin
        enA = temp_PWM;
        enB = temp_PWM;
        end
-      else if (Distance1 > (target+5)) begin
+      else if (trueDistance > (target+10)) begin
        counter3 = 0;
        in1 = 1;
        in2 = 0;

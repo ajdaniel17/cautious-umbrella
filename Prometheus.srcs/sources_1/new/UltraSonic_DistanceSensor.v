@@ -25,14 +25,15 @@ module UltraSonic_DistanceSensor(
     input btnU,
     output led0,led1,led2,led3,led4,led5,led12,
     output reg trigger = 0,
-    output reg [31:0]distance = 0,
+    output reg [31:0] distance = 0,
     output reg [31:0] timecount = 0,
     input [31:0] tempdistance,
     input divdone,
     output reg lastecho,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
     input divdone1,divdone2,divdone3,divdone4,   
-    input [31:0] tempD1,tempD2,tempD3,tempD4
+    input [31:0] tempD1,tempD2,tempD3,tempD4,
+    output reg done=0
     );
     
     localparam START = 4'd1,
@@ -140,6 +141,7 @@ IntegerDivision Uno(
             count <= 0;
             count2 <= 0;
             count3 <= 0;
+            distance <= 0;
         end
             
         
@@ -154,7 +156,8 @@ IntegerDivision Uno(
         if (plzWait > 32'd100) begin
             if(count > 32'd1000)
             begin
-                plzWait = 0;
+                done <= 0;
+                plzWait <= 0;
                 timecount <= 0;
                 count <= 0;
                 count2 <= 0;
@@ -166,7 +169,7 @@ IntegerDivision Uno(
                 count <= count + 1;
         end
         else
-            plzWait = plzWait + 1;
+            plzWait <= plzWait + 1;
         end
         WAITING: begin
         L0 = 1'b0;
@@ -179,7 +182,7 @@ IntegerDivision Uno(
          if (plzWait > 32'd100) begin
             if (echo != lastecho) begin
                 //count2 <= count2 + 1;
-                plzWait = 0;
+                plzWait <= 0;
                 state <= COUNTTIME;
                 count2 <= 0;
                 count3 <= 0; 
@@ -187,7 +190,7 @@ IntegerDivision Uno(
             
             if(count2 >= 32'd50000)
             begin
-                plzWait = 0;
+                plzWait <= 0;
                 count <= 0;
                 count2 <= 0;
                 state <= SIXTYHZ;
@@ -217,7 +220,7 @@ IntegerDivision Uno(
             end
             if(echo != lastecho)
             begin  
-                plzWait = 0;
+                plzWait <= 0;
                 timecount <= timecount + 1;
                 state <= CONVERTING;
                 DIVenable <= 1;
@@ -225,7 +228,7 @@ IntegerDivision Uno(
             
             if(count3 >= 32'd6000000)
             begin
-                plzWait = 0;
+                plzWait <= 0;
                 count <=0;
                 count3 <= 0;
                 state <= SIXTYHZ;
@@ -256,9 +259,9 @@ IntegerDivision Uno(
               count6 <= count6 + 1;
             end
             
-        else if(DIVenable == 0) begin
+        /*else if(DIVenable == 0) begin
             DIVenable <= 1;
-        end
+        end*/
         end
         
         DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
@@ -296,6 +299,7 @@ IntegerDivision Uno(
             D4 <= tempD4;
             DIVenable4 <= 0;
             state <= BUFFER;
+            done <= 1;
         end
         
         
@@ -319,7 +323,7 @@ IntegerDivision Uno(
             btnChange = 1;
             
             if(btnChange) begin
-                if(count4 > 32'd10000000) begin
+                if(count4 > 32'd25000000) begin
                     //count <= 0;
                     //count2 <= 0;
                     //count3 <= 0;
@@ -344,6 +348,7 @@ IntegerDivision Uno(
             if(count5 > 32'd1666666) begin
                 L12 = 0;
                 count5 <= 0;
+                distance = 0;
                 state <= START;
                 trigger <= 1;
             end
