@@ -28,10 +28,15 @@ module Search_Algorithm(
     output LED0, LED1, LED2, LED3, LED4, LED5, LED12,
     input [4:0] D1,D2,D3,D4,
     output[4:0] D1o,D2o,D3o,D4o,
-    input distanceDone
+    input distanceDone,
+    input signed [15:0] tic_count_L,tic_count_R,
+    input Encoder1A,Encoder1B,Encoder2A,Encoder2B
     );
- 
+    localparam IDLE = 0,
+               ALIGN = 1;
+    
     reg [21:0] counter = 0;
+    reg [31:0] counter1 = 0;
     reg [31:0] counter2 = 0;
     reg [31:0] counter3 = 0;
     reg [31:0] width;
@@ -39,8 +44,16 @@ module Search_Algorithm(
     reg Distance1ENA = 0;
     reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
-    reg [31:0] target = 300;
+    reg [31:0] target = 200;
     reg [31:0] trueDistance = 0;
+    reg debug = 0;
+    reg [3:0] state = 1;
+    reg aligned = 1;
+    reg startalign = 1;
+    reg [31:0] shortestDistance = 1000000000;
+    reg [31:0] previousShortestDistance = 0;
+    reg turn = 0;
+    reg [4:0] i= 0;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -85,87 +98,233 @@ UltraSonic_DistanceSensor FindDistance1(
 .done(distanceDone)
 ); 
 
+Encoder_Reader Left_Side(
+    .signalA(Encoder1A),
+    .signalB(Encoder1B),
+    .clock(clock),
+    .tic_count(tic_count_L),
+    .D1(),
+    .D2(),
+    .D3(),
+    .D4(),  
+    .divdone1(),
+    .divdone2(),
+    .divdone3(),
+    .divdone4(),   
+    .tempD1(),
+    .tempD2(),
+    .tempD3(),
+    .tempD4()
+    );
+    
+Encoder_Reader Right_Side(
+    .signalA(Encoder2A),
+    .signalB(Encoder2B),
+    .clock(clock),
+    .tic_count(tic_count_R),
+    .D1(),
+    .D2(),
+    .D3(),
+    .D4(),  
+    .divdone1(),
+    .divdone2(),
+    .divdone3(),
+    .divdone4(),   
+    .tempD1(),
+    .tempD2(),
+    .tempD3(),
+    .tempD4()
+    );
+    
+    
+ 
+    
 always @ (posedge clock) begin
 if(distanceDone)
-    trueDistance = Distance1;
+    trueDistance <= Distance1;
+    previousShortestDistance <= shortestDistance;
 end
 
 always @ (posedge clock) begin
-    lastDistance <= Distance1;
+    lastDistance <= trueDistance;
 end
 
 always @ (posedge clock) begin
 
-
-        if(trueDistance  > (target+200) || trueDistance  < (target- 200)) begin
-        width <= 866666;
-        end
-        else if ((trueDistance < (target+50)) & (trueDistance > (target-50))) begin
-        width <= 250000;
-        
-        end
-        else if ((trueDistance < (target+100)) & (trueDistance > (target-100))) begin
-        width <= 500000;
-        end
-        
-        if (counter > 1666666)
-            counter <= 0;
-        else
-            counter <= counter +1;
+                if (counter > 1666666)
+                    counter <= 0;
+                else
+                    counter <= counter +1;
+                    
+                if(counter < width)
+                   temp_PWM <= 1;
+                else 
+                   temp_PWM <= 0;   
+                   
+               if (counter2 > 1000000) begin
+                Distance1ENA <= 1;
+                counter2 <= 0;
+               end
+               else if (distanceDone)begin
+                 Distance1ENA <= 0;
+                counter2 <= counter2 + 1;
+               end 
+    case(state)
+    IDLE:
+    begin
+    
+    end
+    ALIGN:
+    begin    
+   
+    enA <= temp_PWM;
+    enB <= temp_PWM;
+        if(~turn) begin
+            if(counter1 > 10000000) begin
             
-        if((Distance1>(trueDistance+50)) || (Distance1<(trueDistance - 50))) begin
-        ANGRYFLAG <= 1;
-        end
-        else 
-            ANGRYFLAG <= 0;
+            if (i <10) begin
+                if(shortestDistance > trueDistance & trueDistance > 40 & in1 == 0)
+                    shortestDistance <= trueDistance;
+                    
+                if(tic_count_R > -100 & tic_count_L < 100) begin
+                   in1 <= 1;
+                   in2 <= 0;
+                   in3 <= 1;
+                   in4 <= 0;
+                   width <= 500000;
+                  
+                end
+                else begin
+                   in1 <= 0;
+                   in2 <= 0;
+                   in3 <= 0;
+                   in4 <= 0;
+                   i <= i + 1;
+                   counter1 <= 0;
+                   end
+                   end
+               else begin
+                turn <= 1;
+               aligned <= 0;
+                 end
+               end
+           
+           
+           end
+           else
+            counter1 <= counter1 +1;  
+               
         
-        if(counter < width)
-           temp_PWM <= 1;
-        else 
-           temp_PWM <= 0;   
-       
-       if (counter2 > 1000000) begin
-        Distance1ENA <= 1;
-        counter2 <= 0;
-       end
-       else if (distanceDone)begin
-         Distance1ENA <= 0;
-        counter2 <= counter2 + 1;
-       end           
-       
-       //if (counter3 > 10000000) begin
-       if (trueDistance < 50 || ANGRYFLAG == 1) begin
-        counter3 = 0;
-        enA = 0;
-        enB = 0;
-       end
-       else if(trueDistance < (target-10)) begin
-       counter3 = 0;
-       in1 = 0;
-       in2 = 1;
-       in3 = 1;
-       in4 = 0;
-       enA = temp_PWM;
-       enB = temp_PWM;
-       end
-      else if (trueDistance > (target+10)) begin
-       counter3 = 0;
-       in1 = 1;
-       in2 = 0;
-       in3 = 0;
-       in4 = 1;
-       enA = temp_PWM;
-       enB = temp_PWM;
-      end
-      else begin
-      counter3 = 0;
-      enA = 0;
-      enB = 0;
-      end
-      //end
-      //else begin 
-      //  counter3 = counter3 + 1;
-      //end
+                
+        if(~aligned) begin
+            if((trueDistance > (shortestDistance + 2))) begin
+               in1 <= 0;
+               in2 <= 1;
+               in3 <= 0;
+               in4 <= 1;
+                width <= 350000;
+            end
+            else
+            begin
+               in1 <= 0;
+               in2 <= 0;
+               in3 <= 0;
+               in4 <= 0;
+               aligned = 1;
+            end
+            end
+//            end
+//            if(startalign)
+//            begin
+//               shortestDistance <= trueDistance;
+               
+//               startalign = 0;
+//            end
+//            if(lastDistance > trueDistance) begin
+//               in1 <= 1;
+//               in2 <= 0;
+//               in3 <= 1;
+//               in4 <= 0;
+//            end
+//            if(lastDistance < trueDistance) begin
+//               in1 <= 0;
+//               in2 <= 1;
+//               in3 <= 0;
+//               in4 <= 1;
+//            end
+            
+//            if(shortestDistance < trueDistance)
+//                shortestDistance <= trueDistance;
+//            
+//            if(counter > 10000000)
+//                begin
+//                counter <= 0;
+//                end
+//            else
+//                counter <= counter +1; 
+                
+          
+    end
+    
+    endcase
+        if(debug) begin
+                if(trueDistance  > (target+200) || trueDistance  < (target- 200)) begin
+                width <= 866666;
+                end
+                else if ((trueDistance < (target+50)) & (trueDistance > (target-50))) begin
+                width <= 250000;
+                
+                end
+                else if ((trueDistance < (target+100)) & (trueDistance > (target-100))) begin
+                width <= 500000;
+                end
+                
+                
+                    
+                if((Distance1>(trueDistance+50)) || (Distance1<(trueDistance - 50))) begin
+                ANGRYFLAG <= 1;
+                end
+                else 
+                    ANGRYFLAG <= 0;
+                
+                
+               
+                         
+               
+               //if (counter3 > 10000000) begin
+               if (trueDistance < 50 || ANGRYFLAG == 1) begin
+                counter3 = 0;
+                enA = 0;
+                enB = 0;
+               end
+               else if(trueDistance < (target-10)) begin
+               counter3 = 0;
+               in1 = 0;
+               in2 = 1;
+               in3 = 1;
+               in4 = 0;
+               enA = temp_PWM;
+               enB = temp_PWM;
+               end
+              else if (trueDistance > (target+10)) begin
+               counter3 = 0;
+               in1 = 1;
+               in2 = 0;
+               in3 = 0;
+               in4 = 1;
+               enA = temp_PWM;
+               enB = temp_PWM;
+              end
+              else begin
+              counter3 = 0;
+              enA = 0;
+              enB = 0;
+              end
+              //end
+              //else begin 
+              //  counter3 = counter3 + 1;
+              //end
+              end
 end
 
 assign D1o = D1;

@@ -46,13 +46,14 @@ module Prometheus(
     output JC1,JC2,JC3,JC4,JC5,JC6,
     output s0,s1,s2,s3,s4,s5,s6,dp,
     output LED0,LED1,LED2,LED3,LED4,LED5,LED12,
+    input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     //LED12,LED13,LED14,LED15,
     input colorinput,
-    output colors2,colors3,
+
     output [3:0] an,
     output testfrq,
-    output JA4,JA6,
-    input JA5,
+    output trigger1,
+    input echo1,
     input JB2,
     input JB3,
     input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n
@@ -88,8 +89,8 @@ module Prometheus(
 
 Search_Algorithm Brain(
 .clock(clock),
-.JA5(JA5),
-.JA4(JA4),
+.JA5(echo1),
+.JA4(trigger1),
 .Distance1(),
 .in1(JC3),
 .in2(JC4),
@@ -111,7 +112,11 @@ Search_Algorithm Brain(
 .LED3(LED3),
 .LED4(LED4),
 .LED5(LED5),
-.LED12(LED12)
+.LED12(LED12),
+.Encoder1A(Encoder1A),
+.Encoder1B(Encoder1B),
+.Encoder2A(Encoder2A),
+.Encoder2B(Encoder2B)
 );
 
 /*assign L0  = L0 ;
