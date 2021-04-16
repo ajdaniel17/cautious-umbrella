@@ -36,7 +36,6 @@ module Search_Algorithm(
                ALIGN = 1;
     
     reg [21:0] counter = 0;
-    reg [31:0] counter1 = 0;
     reg [31:0] counter2 = 0;
     reg [31:0] counter3 = 0;
     reg [31:0] width;
@@ -53,7 +52,6 @@ module Search_Algorithm(
     reg [31:0] shortestDistance = 1000000000;
     reg [31:0] previousShortestDistance = 0;
     reg turn = 0;
-    reg [4:0] i= 0;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -180,39 +178,29 @@ always @ (posedge clock) begin
     enA <= temp_PWM;
     enB <= temp_PWM;
         if(~turn) begin
-            if(counter1 > 10000000) begin
-            
-            if (i <10) begin
-                if(shortestDistance > trueDistance & trueDistance > 40 & in1 == 0)
-                    shortestDistance <= trueDistance;
-                    
-                if(tic_count_R > -100 & tic_count_L < 100) begin
-                   in1 <= 1;
-                   in2 <= 0;
-                   in3 <= 1;
-                   in4 <= 0;
-                   width <= 500000;
-                  
-                end
-                else begin
-                   in1 <= 0;
-                   in2 <= 0;
-                   in3 <= 0;
-                   in4 <= 0;
-                   i <= i + 1;
-                   counter1 <= 0;
-                   end
-                   end
-               else begin
-                turn <= 1;
+
+            if(shortestDistance > trueDistance & trueDistance > 40)
+                shortestDistance <= trueDistance;
+                
+            if(tic_count_R > -550 & tic_count_L < 550) begin
+               in1 <= 1;
+               in2 <= 0;
+               in3 <= 1;
+               in4 <= 0;
+               width <= 500000;
+              
+            end
+            else begin
+               in1 <= 0;
+               in2 <= 0;
+               in3 <= 0;
+               in4 <= 0;
+               turn <= 1;
                aligned <= 0;
-                 end
                end
-           
-           
+
            end
-           else
-            counter1 <= counter1 +1;  
+             
                
         
                 
@@ -222,7 +210,7 @@ always @ (posedge clock) begin
                in2 <= 1;
                in3 <= 0;
                in4 <= 1;
-                width <= 350000;
+                width <= 500000;
             end
             else
             begin
