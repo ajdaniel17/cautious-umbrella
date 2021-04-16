@@ -38,8 +38,11 @@ module Search_Algorithm(
     reg [21:0] counter = 0;
     reg [31:0] counter2 = 0;
     reg [31:0] counter3 = 0;
+    reg [31:0] counter4 = 0;
     reg [31:0] width;
+    reg [31:0] width2;
     reg temp_PWM = 0;
+    reg temp_PWM2 = 0;
     reg Distance1ENA = 0;
     reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
@@ -157,9 +160,19 @@ always @ (posedge clock) begin
                 if(counter < width)
                    temp_PWM <= 1;
                 else 
-                   temp_PWM <= 0;   
+                   temp_PWM <= 0;
                    
-               if (counter2 > 1000000) begin
+               if (counter4 > 1666666)
+                    counter4 <= 0;
+                else
+                    counter4 <= counter +1;
+                    
+                if(counter4 < width2)
+                   temp_PWM2 <= 1;
+                else 
+                   temp_PWM2 <= 0;    
+                   
+               if (counter2 > 500000) begin
                 Distance1ENA <= 1;
                 counter2 <= 0;
                end
@@ -176,18 +189,19 @@ always @ (posedge clock) begin
     begin    
    
     enA <= temp_PWM;
-    enB <= temp_PWM;
+    enB <= temp_PWM2;
         if(~turn) begin
 
             if(shortestDistance > trueDistance & trueDistance > 40)
                 shortestDistance <= trueDistance;
                 
-            if(tic_count_R > -550 & tic_count_L < 550) begin
+            if(tic_count_R > -600 & tic_count_L < 600) begin
                in1 <= 1;
                in2 <= 0;
                in3 <= 1;
                in4 <= 0;
-               width <= 500000;
+               width <= 440000;
+               width2 <= 440000;
               
             end
             else begin
@@ -205,12 +219,13 @@ always @ (posedge clock) begin
         
                 
         if(~aligned) begin
-            if((trueDistance > (shortestDistance + 2))) begin
+            if((trueDistance > (shortestDistance + 3))) begin
                in1 <= 0;
                in2 <= 1;
                in3 <= 0;
                in4 <= 1;
-                width <= 500000;
+               width <= 424000;
+               width2 <= 422000;
             end
             else
             begin
