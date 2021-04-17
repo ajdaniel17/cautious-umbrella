@@ -27,7 +27,7 @@ module Search_Algorithm(
     output enA,enB,
     input led0,led1,led2,led3,led4,led5,led6,led12,
     output LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED12,
-    input [4:0] D1,D2,D3,D4,
+    input [4:0] De1,De2,De3,De4,
     output[4:0] D1o,D2o,D3o,D4o,
     input distanceDone,
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B
@@ -84,10 +84,10 @@ UltraSonic_DistanceSensor FindDistance1(
 .timecount(),
 .divdone(),
 .lastecho(),
-.D1(D1),
-.D2(D2),
-.D3(D3),
-.D4(D4),  
+.D1(),
+.D2(),
+.D3(),
+.D4(),  
 .divdone1(),
 .divdone2(),
 .divdone3(),
@@ -99,15 +99,16 @@ UltraSonic_DistanceSensor FindDistance1(
 .done(distanceDone)
 ); 
 
-Encoder_Reader Left_Side(
+
+Encoder_Reader2 Left_Side(
     .signalA(Encoder1A),
     .signalB(Encoder1B),
     .clock(clock),
-    .tic_count(tic_count_L),
-    .D1(),
+    .tic_count(tic_count_L)  
+    /*.D1(),
     .D2(),
     .D3(),
-    .D4(),  
+    .D4(),
     .divdone1(),
     .divdone2(),
     .divdone3(),
@@ -115,28 +116,29 @@ Encoder_Reader Left_Side(
     .tempD1(),
     .tempD2(),
     .tempD3(),
-    .tempD4()
+    .tempD4()*/
     );
-    
+  
 Encoder_Reader Right_Side(
     .signalA(Encoder2A),
     .signalB(Encoder2B),
     .clock(clock),
     .tic_count(tic_count_R),
-    .D1(),
-    .D2(),
-    .D3(),
-    .D4(),  
-    .divdone1(),
+    .D1(De1),
+    .D2(De2),
+    .D3(De3),
+    .D4(De4)
+    /*.divdone1(),
     .divdone2(),
     .divdone3(),
     .divdone4(),   
     .tempD1(),
     .tempD2(),
     .tempD3(),
-    .tempD4()
+    .tempD4()*/
     );
-    
+    //Right is B
+    /*
  Encoder_Adjustment Voodoo(
 .clock(clock),
 .tic_count1(tic_count_L),
@@ -151,7 +153,7 @@ Encoder_Reader Right_Side(
 .led4(led4),
 .led5(led5),
 .led6(led6)
- );
+ );*/
     
  
     
@@ -184,10 +186,10 @@ always @ (posedge clock) begin
     ALIGN:
     begin    
    if(speedboy) begin
-       in1 <= 0;
-       in2 <= 1;
-       in3 <= 1;
-       in4 <= 0;
+       in1 <= 1;
+       in2 <= 0;
+       in3 <= 0;
+       in4 <= 1;
        width <= 500000;
        speedboy <= 0;
    end
@@ -299,8 +301,8 @@ always @ (posedge clock) begin
               end
 end
 
-assign D1o = D1;
-assign D2o = D2;
-assign D3o = D3;
-assign D4o = D4;
+assign D1o = De1;
+assign D2o = De2;
+assign D3o = De3;
+assign D4o = De4;
 endmodule

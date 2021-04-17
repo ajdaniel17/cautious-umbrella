@@ -39,7 +39,7 @@ module Encoder_Adjustment(
                SC2      = 3,
                RESTART  = 4;
     
-    reg signed [2:0] negativeOne = -1;
+    reg signed [31:0] negativeOne = -1;
     reg[31:0] width1,width2;
     reg[31:0] counter = 0;
     reg[31:0] prevWidth = 0;
@@ -145,18 +145,30 @@ IntegerDivision SC2_FinalValue(
                 ABSOLUTE:
                 begin
                     LED0 <= 1;
-                    ticdiff1 <= (((tic_count1-ticPoint1) >= 0) || ((tic_count1-ticPoint1) < 0)) ? (tic_count1-ticPoint1) : ((tic_count1-ticPoint1)*negativeOne);
-                    ticdiff2 <= (((tic_count2-ticPoint2) >= 0) || ((tic_count2-ticPoint2) < 0)) ? (tic_count2-ticPoint2) : ((tic_count2-ticPoint2)*negativeOne);
+                    if((tic_count1-ticPoint1) > 0) begin
+                    ticdiff1 <= (tic_count1-ticPoint1);
+                    end
+                    else
+                    ticdiff1 <= ((tic_count1-ticPoint1)*negativeOne);
+                    
+                    if((tic_count2-ticPoint2) > 0) begin
+                    ticdiff2 <= (tic_count2-ticPoint2);
+                    end
+                    else
+                    ticdiff2 <= ((tic_count2-ticPoint2)*negativeOne);
+                    
+                   // ticdiff1 <= (((tic_count1-ticPoint1) >= 0) || ((tic_count1-ticPoint1) < 0)) ? (tic_count1-ticPoint1) : ((tic_count1-ticPoint1)*negativeOne);
+                   // ticdiff2 <= (((tic_count2-ticPoint2) >= 0) || ((tic_count2-ticPoint2) < 0)) ? (tic_count2-ticPoint2) : ((tic_count2-ticPoint2)*negativeOne);
                     state <= COMPARE;
                 end
                 COMPARE: 
                 begin
                     LED1 <= 1;
-                    if(ticdiff1 < ticdiff2) begin
+                    if((ticdiff1+4'd10) < ticdiff2) begin
                         state <= SC1;
                         DIVenable1 <= 1;
                     end
-                    else if (ticdiff1 > ticdiff2) begin
+                    else if (ticdiff1 > (ticdiff2+4'd10)) begin
                         state <= SC2;
                         DIVenable2 <= 1;
                     end
@@ -213,13 +225,21 @@ IntegerDivision SC2_FinalValue(
                     ticPoint1 <= tic_count1;
                     ticPoint2 <= tic_count2;
                     counter2 <= 0;
-                    state <= 0;
+                    
                 end
             endcase
         end
-        else
+        else begin
             counter2 <= counter2 + 1;
-        
+            state <= 0;
+            LED0 <= 0;
+            LED1 <= 0;
+            LED2 <= 0;
+            LED3 <= 0;
+            LED4 <= 0;
+            LED5 <= 0;
+            LED6 <= 0;
+        end
         end
     end
     
