@@ -100,7 +100,7 @@ UltraSonic_DistanceSensor FindDistance1(
 ); 
 
 
-Encoder_Reader2 Left_Side(
+THEDEATHNOTE Left_Side(
     .signalA(Encoder1A),
     .signalB(Encoder1B),
     .clock(clock),
@@ -138,7 +138,7 @@ Encoder_Reader Right_Side(
     .tempD4()*/
     );
     //Right is B
-    /*
+ 
  Encoder_Adjustment Voodoo(
 .clock(clock),
 .tic_count1(tic_count_L),
@@ -153,7 +153,7 @@ Encoder_Reader Right_Side(
 .led4(led4),
 .led5(led5),
 .led6(led6)
- );*/
+ );
     
  
     

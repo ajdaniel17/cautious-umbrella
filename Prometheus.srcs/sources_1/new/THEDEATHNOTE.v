@@ -15,12 +15,12 @@
 // 
 // Revision:
 // Revision 0.01 - File Created
-// Additional Comments:
+// Additional Comments:asdf
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Encoder_Reader(
+module THEDEATHNOTE(
     input signalA,signalB,clock,
     output reg signed [31:0] tic_count = 0,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
