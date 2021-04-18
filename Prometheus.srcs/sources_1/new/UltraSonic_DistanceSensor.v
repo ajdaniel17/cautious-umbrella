@@ -323,7 +323,7 @@ IntegerDivision Uno(
             btnChange = 1;
             
             if(btnChange) begin
-                if(count4 > 32'd25000000) begin
+                if(count4 > 32'd20000000) begin
                     //count <= 0;
                     //count2 <= 0;
                     //count3 <= 0;

@@ -45,18 +45,19 @@ module Prometheus(
     input testport,
     output JC1,JC2,JC3,JC4,JC5,JC6,
     output s0,s1,s2,s3,s4,s5,s6,dp,
-    output LED0,LED1,LED2,LED3,LED4,LED5,LED12,
+    output LED0,LED1,LED2,LED3,LED4,LED5,LED12,LED14,LED15,
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     //LED12,LED13,LED14,LED15,
     input colorinput,
 
     output [3:0] an,
-    output testfrq,
+    //output testfrq,
     output trigger1,
     input echo1,
     input JB2,
     input JB3,
-    input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n
+    input JX1,JX1n,JX2,JX2n,JX3,JX3n,JX4,JX4n,
+    input IRSense1, IRSense2
     //input L0 ,led1,led2,led3,led4,led5
 
     //input[4:0] D1,D2,D3,D4,
@@ -116,7 +117,9 @@ Search_Algorithm Brain(
 .Encoder1A(Encoder1A),
 .Encoder1B(Encoder1B),
 .Encoder2A(Encoder2A),
-.Encoder2B(Encoder2B)
+.Encoder2B(Encoder2B),
+.IRSense1(IRSense1),
+.IRSense2(IRSense2)
 );
 
 /*assign L0  = L0 ;
@@ -219,5 +222,6 @@ SevenSegmentDisplay SevenDisplay(
 .input3(D1),
 .an(an)
 );
-
+    assign LED14 = IRSense1;
+    assign LED15 = IRSense2;
 endmodule

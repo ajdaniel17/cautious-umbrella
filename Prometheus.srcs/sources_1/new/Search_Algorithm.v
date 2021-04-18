@@ -30,7 +30,8 @@ module Search_Algorithm(
     output[4:0] D1o,D2o,D3o,D4o,
     input distanceDone,
     input signed [15:0] tic_count_L,tic_count_R,
-    input Encoder1A,Encoder1B,Encoder2A,Encoder2B
+    input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
+    input IRSense1, IRSense2
     );
     localparam IDLE = 0,
                ALIGN = 1;
@@ -39,7 +40,7 @@ module Search_Algorithm(
     reg [31:0] counter2 = 0;
     reg [31:0] counter3 = 0;
     reg [31:0] counter4 = 0;
-    reg [31:0] width;
+    reg [31:0] width1;
     reg [31:0] width2;
     reg temp_PWM = 0;
     reg temp_PWM2 = 0;
@@ -55,6 +56,13 @@ module Search_Algorithm(
     reg [31:0] shortestDistance = 1000000000;
     reg [31:0] previousShortestDistance = 0;
     reg turn = 0;
+    reg doneR = 0;
+    reg doneL = 0;
+    reg start = 1;
+    reg [31:0] IRcount1 = 0;
+    reg [31:0] IRcount2 = 0;
+    reg IRdone1 = 0;
+    reg IRdone2 = 0;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -99,7 +107,7 @@ UltraSonic_DistanceSensor FindDistance1(
 .done(distanceDone)
 ); 
 
-Encoder_Reader Left_Side(
+LightYagami Left_Side(
     .signalA(Encoder1A),
     .signalB(Encoder1B),
     .clock(clock),
@@ -157,7 +165,7 @@ always @ (posedge clock) begin
                 else
                     counter <= counter +1;
                     
-                if(counter < width)
+                if(counter < width1)
                    temp_PWM <= 1;
                 else 
                    temp_PWM <= 0;
@@ -172,7 +180,7 @@ always @ (posedge clock) begin
                 else 
                    temp_PWM2 <= 0;    
                    
-               if (counter2 > 500000) begin
+               if (counter2 > 1000000) begin
                 Distance1ENA <= 1;
                 counter2 <= 0;
                end
@@ -190,42 +198,140 @@ always @ (posedge clock) begin
    
     enA <= temp_PWM;
     enB <= temp_PWM2;
-        if(~turn) begin
-
-            if(shortestDistance > trueDistance & trueDistance > 40)
-                shortestDistance <= trueDistance;
-                
-            if(tic_count_R > -600 & tic_count_L < 600) begin
-               in1 <= 1;
-               in2 <= 0;
-               in3 <= 1;
-               in4 <= 0;
-               width <= 440000;
-               width2 <= 440000;
-              
+    
+    if(start) begin
+        width1 <= 450000;
+        width2 <= 450000;
+        if(IRdone1==1 & IRdone2==1) begin
+            in1<=0;
+            in2<=0;
+            in3<=0;
+            in4<=0;
+            start <= 0;
+            turn <= 1;
+        end
+        else begin
+            if(IRcount1 > 1666666) begin
+                in1 <= 0;
+                in2 <= 0;
+                IRdone1 <= 1;
+            end 
+            else if(IRSense1 == 0) begin
+                IRcount1 <= IRcount1 + 1;
+                /*in1 <= 0;
+                in2 <= 0;*/
+            end
+            else begin
+                IRcount1 <= 0;
+                in1 <= 0;
+                in2 <= 1;
+            end
+            
+            if(IRcount2 > 1666666) begin
+                in3 <= 0;
+                in4 <= 0;
+                IRdone2 <= 1;
+            end 
+            else if(IRSense2 == 0) begin
+                IRcount2 <= IRcount2 + 1;
+                /*in3 <= 0;
+                in4 <= 0;*/
+            end
+            else begin
+                IRcount2 <= 0;
+                in3 <= 1;
+                in4 <= 0;
+            end
+        end
+    end
+    
+    if(turn) begin
+        
+        if(tic_count_L < 1800) begin
+                in1 <= 1;
+                in2 <= 0;
+                width1 <= 500000;
             end
             else begin
                in1 <= 0;
                in2 <= 0;
+               doneL <= 1;
+               //turn <= 1;
+               //aligned <= 0;
+            end
+            
+            if(tic_count_R > -1700) begin
+               in3 <= 1;
+               in4 <= 0;
+               width2 <= 500000;
+               //width2 <= 500000;
+            end
+            else begin
                in3 <= 0;
                in4 <= 0;
-               turn <= 1;
-               aligned <= 0;
+               doneR <= 1;
+               //turn <= 1;
+               //aligned <= 0;
                end
+  
+            if((doneR == 1 || doneL == 1)) begin
+                //stuff 
+            end
+    end
+    
+    end
+        /*if(~turn) begin
 
-           end
+            if(shortestDistance > trueDistance & trueDistance > 100)
+                shortestDistance <= trueDistance;
+                
+            //if(tic_count_R < 10000 & tic_count_L < 10000) begin
+            
+            if(tic_count_L < 1800) begin
+                in1 <= 1;
+                in2 <= 0;
+                width1 <= 420000;
+            end
+            else begin
+               in1 <= 0;
+               in2 <= 0;
+               doneL <= 1;
+               //turn <= 1;
+               //aligned <= 0;
+            end
+            
+            if(tic_count_R > -1700) begin
+               in3 <= 1;
+               in4 <= 0;
+               width2 <= 420000;
+               //width2 <= 500000;
+            end
+            else begin
+               in3 <= 0;
+               in4 <= 0;
+               doneR <= 1;
+               //turn <= 1;
+               //aligned <= 0;
+               end
+               
+            
+            if((doneR == 1 || doneL == 1)) begin
+                
+            end
+
+           end*/
              
                
         
                 
-        if(~aligned) begin
-            if((trueDistance > (shortestDistance + 3))) begin
+        /*if(~aligned) begin
+            if((trueDistance > (shortestDistance + 20)) || (trueDistance<100)) begin
                in1 <= 0;
                in2 <= 1;
                in3 <= 0;
                in4 <= 1;
-               width <= 424000;
-               width2 <= 422000;
+               width1 <= 420000;
+               width2 <= 420000;
             end
             else
             begin
@@ -235,7 +341,7 @@ always @ (posedge clock) begin
                in4 <= 0;
                aligned = 1;
             end
-            end
+            end*/
 //            end
 //            if(startalign)
 //            begin
@@ -267,19 +373,19 @@ always @ (posedge clock) begin
 //                counter <= counter +1; 
                 
           
-    end
+
     
     endcase
         if(debug) begin
                 if(trueDistance  > (target+200) || trueDistance  < (target- 200)) begin
-                width <= 866666;
+                width1 <= 866666;
                 end
                 else if ((trueDistance < (target+50)) & (trueDistance > (target-50))) begin
-                width <= 250000;
+                width1 <= 250000;
                 
                 end
                 else if ((trueDistance < (target+100)) & (trueDistance > (target-100))) begin
-                width <= 500000;
+                width1 <= 500000;
                 end
                 
                 
