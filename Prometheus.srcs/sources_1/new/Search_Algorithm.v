@@ -220,8 +220,9 @@ always @ (posedge clock) begin
                 else 
                    temp_PWM2 <= 0;    
                    
-               if (counter2 > 100) begin
-                 Distance1ENA <= 1;       
+               if (counter2 > 2000) begin
+                 Distance1ENA <= 1;
+                 counter2 <= 0;       
                end
                else if (distanceDone)begin
                  Distance1ENA <= 0;
@@ -233,6 +234,9 @@ always @ (posedge clock) begin
                end 
                else if (distanceDone & distance2Done) begin
                 counter2 <= counter2 + 1;
+               end
+               else begin
+                counter2 <= 0;
                end
                
                
