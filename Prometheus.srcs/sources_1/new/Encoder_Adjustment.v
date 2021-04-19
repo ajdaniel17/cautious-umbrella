@@ -31,7 +31,7 @@ module Encoder_Adjustment(
     input divdone1,divdone2,divdone3,divdone4,
     input [31:0] NewWidth1, NewWidth2,
     
-    output led0,led1,led2,led3,led4,led5,led6
+    output led0,led1,led2,led3,led4,led5,led6,led15,led14
     );
     localparam ABSOLUTE = 0,
                COMPARE  = 1,
@@ -56,6 +56,10 @@ module Encoder_Adjustment(
     reg corboVar1 = 0;
     reg corboVar2 = 0;
     
+    reg [31:0] counter3 = 0;
+    reg [31:0] counter4 = 0;
+    reg timeout = 0;
+    reg buffer = 0;
     
     
     
@@ -84,7 +88,7 @@ IntegerDivision SC2_Divider(
 IntegerDivision SC1_FinalValue(
 .enable(DIVenable3),
 .done(divdone3),
-.Dividend(width1),
+.Dividend(width1*(8'd100)),
 .Divisor(Percent1local),
 .clock(clock),
 .Quotient(NewWidth1),
@@ -95,7 +99,7 @@ IntegerDivision SC1_FinalValue(
 IntegerDivision SC2_FinalValue(
 .enable(DIVenable4),
 .done(divdone4),
-.Dividend(width2),
+.Dividend(width2*(8'd100)),
 .Divisor(Percent2local),
 .clock(clock),
 .Quotient(NewWidth2),
@@ -128,6 +132,33 @@ IntegerDivision SC2_FinalValue(
     //PWM adjustment code
     always @ (posedge clock)
     begin
+    /*
+        if(width1 < 1000) begin
+        width1 <= width;
+        end
+        if(width2 < 1000) begin 
+        width2 <= width;
+        end
+      */  
+      
+      if(counter4 > 25000000) begin
+      buffer <= 1;
+      end
+      else begin
+      counter4 <= counter4 + 1;
+      end
+      
+      
+        if(counter3 > 100000000) begin
+            state <= 0;
+            counter2 <= 0;
+            counter3 <= 0;        
+        end
+        else if(timeout) begin
+        counter3 <= counter3 +1;
+        end
+        
+        
         if(initialize == 1) begin
             width1 <= width;
             width2 <= width;
@@ -144,6 +175,7 @@ IntegerDivision SC2_FinalValue(
             case(state)
                 ABSOLUTE:
                 begin
+                    timeout <= 1;
                     LED0 <= 1;
                     if((tic_count1-ticPoint1) > 0) begin
                     ticdiff1 <= (tic_count1-ticPoint1);
@@ -188,7 +220,7 @@ IntegerDivision SC2_FinalValue(
                     end
                     if(divdone3) begin
                         LED5 <= 1;
-                        width1 <= NewWidth1*100;
+                        width1 <= NewWidth1;
                         DIVenable3 <= 0;
                         state <= RESTART;
                         corboVar1 <= 0;
@@ -209,7 +241,7 @@ IntegerDivision SC2_FinalValue(
                         Percent2local <= Percent2;
                     end
                     if(divdone4) begin 
-                        width2 <= NewWidth2*100;
+                        width2 <= NewWidth2;
                         DIVenable4 <= 0;
                         state <= RESTART;
                         corboVar2 <= 0;
@@ -222,15 +254,21 @@ IntegerDivision SC2_FinalValue(
                 RESTART:
                 begin
                     LED6 <= 1;
-                    ticPoint1 <= tic_count1;
-                    ticPoint2 <= tic_count2;
+                    buffer <= 0;
+                    counter4 <= 0;
                     counter2 <= 0;
+                    ticdiff1 <= 0;
+                    ticdiff2 <= 0;
                     
                 end
             endcase
         end
-        else begin
+        else if(buffer) begin
             counter2 <= counter2 + 1;
+            ticPoint1 <= tic_count1;
+            ticPoint2 <= tic_count2;
+            timeout <= 0;
+            counter3 <= 0;
             state <= 0;
             LED0 <= 0;
             LED1 <= 0;

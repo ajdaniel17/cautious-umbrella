@@ -39,19 +39,19 @@ module Prometheus(
     //TODO: Add more coments so I can remember what any of this does
     input clock,
     input in0,in1,in2,in3,in4,in5,in6,in7,
+    input IR1,IR2,
     input btnC,btnU,
     output PWM,
     input wire control1,control2,
     input testport,
     output JC1,JC2,JC3,JC4,JC5,JC6,
     output s0,s1,s2,s3,s4,s5,s6,dp,
-    output LED0,LED1,LED2,LED3,LED4,LED5,LED6,LED12,
+    output LED0,LED1,LED2,LED3,LED4,LED5,LED6,LED12,LED14,LED15,
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     //LED12,LED13,LED14,LED15,
     input colorinput,
 
     output [3:0] an,
-    output testfrq,
     output trigger1,
     input echo1,
     input JB2,
@@ -92,16 +92,15 @@ Search_Algorithm Brain(
 .JA5(echo1),
 .JA4(trigger1),
 .Distance1(),
+.S0(in0),
+.S1(in1),
+.S2(in2),
 .in1(JC3),
 .in2(JC4),
 .in3(JC5),
 .in4(JC6),
 .enA(JC1),
 .enB(JC2),
-.De1(),
-.De2(),
-.De3(),
-.De4(),
 .D1o(D1),
 .D2o(D2),
 .D3o(D3),
@@ -220,5 +219,6 @@ SevenSegmentDisplay SevenDisplay(
 .input3(D1),
 .an(an)
 );
-
+assign LED14 = IR1;
+assign LED15 = IR2;
 endmodule

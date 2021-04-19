@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Encoder_Reader(
+module Encoder_Reader2(
     input signalA,signalB,clock,
     output reg signed [31:0] tic_count = 0,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
@@ -55,7 +55,7 @@ IntegerDivision Hun(
 .Remainder(bridge2),
 .Percentagemode(0)
 );
-
+//Fuck your shit
 IntegerDivision Ten(
 .enable(DIVenable3),
 .done(divdone3),

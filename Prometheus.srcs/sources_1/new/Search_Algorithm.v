@@ -24,10 +24,11 @@ module Search_Algorithm(
     input clock,JA5,JA4,
     input [31:0] Distance1,
     output reg in1,in2,in3,in4,
+    input S0,S1,S2,
     output enA,enB,
     input led0,led1,led2,led3,led4,led5,led6,led12,
     output LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED12,
-    input [4:0] De1,De2,De3,De4,
+    input [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,  
     output[4:0] D1o,D2o,D3o,D4o,
     input distanceDone,
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B
@@ -54,6 +55,7 @@ module Search_Algorithm(
     reg turn = 0;
     reg speedboy = 1;
     wire [31:0] tic_count_L,tic_count_R;
+    reg [4:0] D1,D2,D3,D4;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -84,10 +86,10 @@ UltraSonic_DistanceSensor FindDistance1(
 .timecount(),
 .divdone(),
 .lastecho(),
-.D1(),
-.D2(),
-.D3(),
-.D4(),  
+.D1(D1s2),
+.D2(D2s2),
+.D3(D3s2),
+.D4(D4s2),  
 .divdone1(),
 .divdone2(),
 .divdone3(),
@@ -104,19 +106,11 @@ Encoder_Reader2 Left_Side(
     .signalA(Encoder1A),
     .signalB(Encoder1B),
     .clock(clock),
-    .tic_count(tic_count_L)  
-    /*.D1(),
-    .D2(),
-    .D3(),
-    .D4(),
-    .divdone1(),
-    .divdone2(),
-    .divdone3(),
-    .divdone4(),   
-    .tempD1(),
-    .tempD2(),
-    .tempD3(),
-    .tempD4()*/
+    .tic_count(tic_count_L),
+    .D1(D1s1),
+    .D2(D2s1),
+    .D3(D3s1),
+    .D4(D4s1)
     );
   
 Encoder_Reader Right_Side(
@@ -124,10 +118,10 @@ Encoder_Reader Right_Side(
     .signalB(Encoder2B),
     .clock(clock),
     .tic_count(tic_count_R),
-    .D1(De1),
-    .D2(De2),
-    .D3(De3),
-    .D4(De4)
+    .D1(D1s0),
+    .D2(D2s0),
+    .D3(D3s0),
+    .D4(D4s0)
     /*.divdone1(),
     .divdone2(),
     .divdone3(),
@@ -138,7 +132,7 @@ Encoder_Reader Right_Side(
     .tempD4()*/
     );
     //Right is B
-    /*
+    
  Encoder_Adjustment Voodoo(
 .clock(clock),
 .tic_count1(tic_count_L),
@@ -153,7 +147,7 @@ Encoder_Reader Right_Side(
 .led4(led4),
 .led5(led5),
 .led6(led6)
- );*/
+ );
     
  
     
@@ -167,6 +161,32 @@ always @ (posedge clock) begin
     lastDistance <= trueDistance;
 end
 
+always @ (posedge clock) begin
+if(S0) begin
+D1 = D1s0;
+D2 = D2s0;
+D3 = D3s0;
+D4 = D4s0;
+end
+else if(S1) begin
+D1 = D1s1;
+D2 = D2s1;
+D3 = D3s1;
+D4 = D4s1;
+end
+else if(S2)begin
+D1 = D1s2;
+D2 = D2s2;
+D3 = D3s2;
+D4 = D4s2;
+end
+else begin
+D1 = 0;
+D2 = 0;
+D3 = 0;
+D4 = 0;
+end 
+end
 always @ (posedge clock) begin
 
                    
@@ -301,8 +321,8 @@ always @ (posedge clock) begin
               end
 end
 
-assign D1o = De1;
-assign D2o = De2;
-assign D3o = De3;
-assign D4o = De4;
+assign D1o = D1;
+assign D2o = D2;
+assign D3o = D3;
+assign D4o = D4;
 endmodule
