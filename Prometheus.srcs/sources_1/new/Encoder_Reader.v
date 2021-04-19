@@ -25,7 +25,8 @@ module Encoder_Reader(
     output reg signed [31:0] tic_count = 0,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
     input divdone1,divdone2,divdone3,divdone4,   
-    input [15:0] tempD1,tempD2,tempD3,tempD4
+    input [15:0] tempD1,tempD2,tempD3,tempD4,
+    input reset
         );
     wire [1:0] Combined_Signal = {signalA,signalB};
     wire signed[31:0] bridge1,bridge2,bridge3;
@@ -84,71 +85,81 @@ IntegerDivision Uno(
     
     always @ (posedge clock)
     begin
-        case(lastCS)
-        2'd0:
-        begin
-            case(Combined_Signal)
-            2'd1:
-            begin
-                tic_count <= tic_count - $signed(1);
-                DIVenable1 = 1; 
-            end
-            2'd2:
-            begin
-                tic_count <= tic_count + $signed(1);
-                DIVenable1 = 1;
-            end
-            endcase
+        if (reset) begin
+            tic_count <= 0;
+            D1 <= 0;
+            D2 <= 0;
+            D3 <= 0;
+            D4 <= 0;
         end
-        2'd1:
-        begin
-            case(Combined_Signal)
-            2'd0:
-            begin
-                tic_count <= tic_count + $signed(1);
-                DIVenable1 = 1;
-            end
-            2'd3:
-            begin
-                tic_count <= tic_count - $signed(1);
-                DIVenable1 = 1;
-            end
-            endcase
-        end
-        2'd2:
-        begin
-            case(Combined_Signal)
-            2'd0:
-            begin
-                tic_count <= tic_count - $signed(1);
-                DIVenable1 = 1;
-            end
-            2'd3:
-            begin
-               tic_count <= tic_count + $signed(1);
-               DIVenable1 = 1;
-            end
-      
-            endcase
-        end
-        2'd3:
-        begin
-            case(Combined_Signal)
-            2'd1:
-            begin
-                tic_count <= tic_count + $signed(1);
-                DIVenable1 = 1;
-            end
-            2'd2:
-            begin
-                tic_count <= tic_count - $signed(1);
-                DIVenable1 = 1;
-            end
-     
-            endcase
         
+        else begin
+            case(lastCS)
+            2'd0:
+            begin
+                case(Combined_Signal)
+                2'd1:
+                begin
+                    tic_count <= tic_count - $signed(1);
+                    DIVenable1 = 1; 
+                end
+                2'd2:
+                begin
+                    tic_count <= tic_count + $signed(1);
+                    DIVenable1 = 1;
+                end
+                endcase
+            end
+            2'd1:
+            begin
+                case(Combined_Signal)
+                2'd0:
+                begin
+                    tic_count <= tic_count + $signed(1);
+                    DIVenable1 = 1;
+                end
+                2'd3:
+                begin
+                    tic_count <= tic_count - $signed(1);
+                    DIVenable1 = 1;
+                end
+                endcase
+            end
+            2'd2:
+            begin
+                case(Combined_Signal)
+                2'd0:
+                begin
+                    tic_count <= tic_count - $signed(1);
+                    DIVenable1 = 1;
+                end
+                2'd3:
+                begin
+                   tic_count <= tic_count + $signed(1);
+                   DIVenable1 = 1;
+                end
+          
+                endcase
+            end
+            2'd3:
+            begin
+                case(Combined_Signal)
+                2'd1:
+                begin
+                    tic_count <= tic_count + $signed(1);
+                    DIVenable1 = 1;
+                end
+                2'd2:
+                begin
+                    tic_count <= tic_count - $signed(1);
+                    DIVenable1 = 1;
+                end
+         
+                endcase
+            
+            end
+            endcase
         end
-        endcase
  
             
         if(divdone1)

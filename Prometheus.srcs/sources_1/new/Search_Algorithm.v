@@ -21,14 +21,16 @@
 
 
 module Search_Algorithm(
-    input clock,JA5,JA4,
+    input clock,JA5,JA4,echo2,trigger2,
+    input S0,S1,S2,S3,
     input [31:0] Distance1,
+    input [31:0] Distance2,
     output reg in1,in2,in3,in4,enA,enB,
     input led0,led1,led2,led3,led4,led5,led12,
     output LED0, LED1, LED2, LED3, LED4, LED5, LED12,
-    input [4:0] D1,D2,D3,D4,
-    output[4:0] D1o,D2o,D3o,D4o,
-    input distanceDone,
+    input [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,D1s3,D2s3,D3s3,D4s3,
+    output reg [4:0] D1o,D2o,D3o,D4o,
+    input distanceDone,distance2Done,
     input signed [15:0] tic_count_L,tic_count_R,
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     input IRSense1, IRSense2
@@ -44,7 +46,9 @@ module Search_Algorithm(
     reg [31:0] width2;
     reg temp_PWM = 0;
     reg temp_PWM2 = 0;
-    reg Distance1ENA = 0;
+    reg Distance1ENA = 1;
+    reg Distance2ENA = 0;
+    reg switch = 0;
     reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
     reg [31:0] target = 200;
@@ -65,6 +69,8 @@ module Search_Algorithm(
     reg IRdone2 = 0;
     reg align2 = 0;
     reg [1:0]firstturn = 0;
+    reg [31:0] turncounter = 0;
+    reg turndone = 0;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -82,42 +88,40 @@ UltraSonic_DistanceSensor FindDistance1(
 .led4(led4),
 .led5(led5),
 .led12(led12),
-.btnU(1'b1),/*
-.led12(led12)
-.led13(LED13),
-.led14(LED14),
-.led15(LED15),*/
+.btnU(Distance1ENA),
 .clock(clock),
 .echo(JA5),
 .trigger(JA4),
 .distance(Distance1),
-.timecount(),
-.divdone(),
-.lastecho(),
-.D1(D1),
-.D2(D2),
-.D3(D3),
-.D4(D4),  
-.divdone1(),
-.divdone2(),
-.divdone3(),
-.divdone4(),   
-.tempD1(),
-.tempD2(),
-.tempD3(),
-.tempD4(),
+.D1(D1s0),
+.D2(D2s0),
+.D3(D3s0),
+.D4(D4s0),  
 .done(distanceDone)
-); 
+);
+
+HyperSonic FindDistance2(
+.btnU(Distance2ENA),
+.clock(clock),
+.echo(echo2),
+.trigger(trigger2),
+.distance(Distance2),
+.D1(D1s3),
+.D2(D2s3),
+.D3(D3s3),
+.D4(D4s3),  
+.done(distance2Done)
+);  
 
 LightYagami Left_Side(
     .signalA(Encoder1A),
     .signalB(Encoder1B),
     .clock(clock),
     .tic_count(tic_count_L),
-    .D1(),
-    .D2(),
-    .D3(),
-    .D4(),  
+    .D1(D1s1),
+    .D2(D2s1),
+    .D3(D3s1),
+    .D4(D4s1),  
     .divdone1(),
     .divdone2(),
     .divdone3(),
@@ -133,10 +137,10 @@ Encoder_Reader Right_Side(
     .signalB(Encoder2B),
     .clock(clock),
     .tic_count(tic_count_R),
-    .D1(),
-    .D2(),
-    .D3(),
-    .D4(),  
+    .D1(D1s2),
+    .D2(D2s2),
+    .D3(D3s2),
+    .D4(D4s2),  
     .divdone1(),
     .divdone2(),
     .divdone3(),
@@ -148,8 +152,42 @@ Encoder_Reader Right_Side(
     );
     
     
- 
-    
+
+
+always @ (posedge clock) begin
+if(S0) begin
+D1o = D1s0;
+D2o = D2s0;
+D3o = D3s0;
+D4o = D4s0;
+end
+else if (S1) begin
+D1o = D1s1;
+D2o = D2s1;
+D3o = D3s1;
+D4o = D4s1;
+end 
+else if (S2) begin
+D1o = D1s2;
+D2o = D2s2;
+D3o = D3s2;
+D4o = D4s2;
+end
+else if(S3) begin
+D1o = D1s3;
+D2o = D2s3;
+D3o = D3s3;
+D4o = D4s3;
+end
+else begin 
+D1o = 0;
+D2o = 0;
+D3o = 0;
+D4o = 0;
+end
+
+end
+
 always @ (posedge clock) begin
 if(distanceDone)
     trueDistance <= Distance1;
@@ -182,14 +220,49 @@ always @ (posedge clock) begin
                 else 
                    temp_PWM2 <= 0;    
                    
-               if (counter2 > 1000000) begin
-                Distance1ENA <= 1;
-                counter2 <= 0;
+               if (counter2 > 100) begin
+                 Distance1ENA <= 1;       
                end
                else if (distanceDone)begin
                  Distance1ENA <= 0;
-                counter2 <= counter2 + 1;
+                 Distance2ENA <= 1;
+               end
+               else if(distance2Done) begin
+               Distance2ENA <= 0;
+               counter2 <= 0;
                end 
+               else if (distanceDone & distance2Done) begin
+                counter2 <= counter2 + 1;
+               end
+               
+               
+if(turn) begin
+    width1 <= 650000;
+    width2 <= 650000;
+    enA <= temp_PWM;
+    enB <= temp_PWM2;
+    if(turncounter > 200000000) begin
+    turncounter <= 0;
+    turndone <= 1; 
+    end
+    else begin
+    turncounter <= turncounter + 1;
+    in1 <= 1;
+    in2 <= 0;
+    in3 <= 1;
+    in4 <= 0;
+    end
+    
+    if(turndone) begin
+    in1 <= 0;
+    in2 <= 0;
+    in3 <= 0;
+    in4 <= 0;
+    turn <= 0;
+    end
+end
+
+
     case(state)
     IDLE:
     begin
@@ -216,6 +289,7 @@ always @ (posedge clock) begin
             if(IRcount1 > 1666666) begin
                 in1 <= 0;
                 in2 <= 0;
+                IRcount1 <= 0;
                 IRdone1 <= 1;
                 if(firstturn == 0) begin
                 firstturn <= 1;
@@ -236,6 +310,7 @@ always @ (posedge clock) begin
             if(IRcount2 > 1666666) begin
                 in3 <= 0;
                 in4 <= 0;
+                IRcount2 <= 0;
                 IRdone2 <= 1;
                 if(firstturn == 0) begin
                 firstturn <= 2;
@@ -258,52 +333,79 @@ always @ (posedge clock) begin
     width1 <= 380000;
     width2 <= 380000;
     if(firstturn == 1) begin
-        if(IRSense1 == 1) begin
+        if(IRcount1 > 1666666) begin
+            in1 <= 0;
+            in2 <= 0;
+            turn <= 1;
+            align2 <= 0;
+        end
+        else if(IRSense1 == 1) begin
+            IRcount1 <= IRcount1 + 1 ;
+        end
+        else
+        begin
+            IRcount1 <= 0;
             in1 <= 1;
             in2 <= 0;
         end
+        
     end
     
     if (firstturn == 2) begin
-        if(IRSense2 == 1) begin
+        if(IRcount2 > 1666666) begin
+            in3 <= 0;
+            in4 <= 0;
+            turn <= 1;
+            align2 <= 0;
+        end
+        else if(IRSense2 == 1) begin
+           IRcount2 <= IRcount2 +1; 
+        end
+        else
+        begin
             in3 <= 0;
             in4 <= 1;
+            IRcount2 <= 0;
         end
     end
     end
-    if(turn) begin
+    
+      if(turndone) begin
+      
+      end
+//    if(turn) begin
         
-        if(tic_count_L < 1800) begin
-                in1 <= 1;
-                in2 <= 0;
-                width1 <= 500000;
-            end
-            else begin
-               in1 <= 0;
-               in2 <= 0;
-               doneL <= 1;
-               //turn <= 1;
-               //aligned <= 0;
-            end
+//        if(tic_count_L < 1800) begin
+//                in1 <= 1;
+//                in2 <= 0;
+//                width1 <= 500000;
+//            end
+//            else begin
+//               in1 <= 0;
+//               in2 <= 0;
+//               doneL <= 1;
+//               //turn <= 1;
+//               //aligned <= 0;
+//            end
             
-            if(tic_count_R > -1700) begin
-               in3 <= 1;
-               in4 <= 0;
-               width2 <= 500000;
-               //width2 <= 500000;
-            end
-            else begin
-               in3 <= 0;
-               in4 <= 0;
-               doneR <= 1;
-               //turn <= 1;
-               //aligned <= 0;
-               end
+//            if(tic_count_R > -1700) begin
+//               in3 <= 1;
+//               in4 <= 0;
+//               width2 <= 500000;
+//               //width2 <= 500000;
+//            end
+//            else begin
+//               in3 <= 0;
+//               in4 <= 0;
+//               doneR <= 1;
+//               //turn <= 1;
+//               //aligned <= 0;
+//               end
   
-            if((doneR == 1 || doneL == 1)) begin
-                //stuff 
-            end
-    end
+//            if((doneR == 1 || doneL == 1)) begin
+//                //stuff 
+//            end
+//    end
     
     end
         /*if(~turn) begin
@@ -462,8 +564,5 @@ always @ (posedge clock) begin
               end
 end
 
-assign D1o = D1;
-assign D2o = D2;
-assign D3o = D3;
-assign D4o = D4;
+
 endmodule
