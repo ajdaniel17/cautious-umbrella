@@ -63,6 +63,8 @@ module Search_Algorithm(
     reg [31:0] IRcount2 = 0;
     reg IRdone1 = 0;
     reg IRdone2 = 0;
+    reg align2 = 0;
+    reg [1:0]firstturn = 0;
     
     assign LED0 = led0;
     assign LED1 = led1;
@@ -208,13 +210,16 @@ always @ (posedge clock) begin
             in3<=0;
             in4<=0;
             start <= 0;
-            turn <= 1;
+            align2 <= 1;
         end
         else begin
             if(IRcount1 > 1666666) begin
                 in1 <= 0;
                 in2 <= 0;
                 IRdone1 <= 1;
+                if(firstturn == 0) begin
+                firstturn <= 1;
+                end
             end 
             else if(IRSense1 == 0) begin
                 IRcount1 <= IRcount1 + 1;
@@ -227,10 +232,14 @@ always @ (posedge clock) begin
                 in2 <= 1;
             end
             
+            
             if(IRcount2 > 1666666) begin
                 in3 <= 0;
                 in4 <= 0;
                 IRdone2 <= 1;
+                if(firstturn == 0) begin
+                firstturn <= 2;
+                end
             end 
             else if(IRSense2 == 0) begin
                 IRcount2 <= IRcount2 + 1;
@@ -245,6 +254,23 @@ always @ (posedge clock) begin
         end
     end
     
+    if(align2) begin
+    width1 <= 380000;
+    width2 <= 380000;
+    if(firstturn == 1) begin
+        if(IRSense1 == 1) begin
+            in1 <= 1;
+            in2 <= 0;
+        end
+    end
+    
+    if (firstturn == 2) begin
+        if(IRSense2 == 1) begin
+            in3 <= 0;
+            in4 <= 1;
+        end
+    end
+    end
     if(turn) begin
         
         if(tic_count_L < 1800) begin
