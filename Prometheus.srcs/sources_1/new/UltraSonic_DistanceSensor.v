@@ -156,12 +156,12 @@ IntegerDivision Uno(
         
         case(state)
         START: begin
-        L0  = 1'b1;
-        L1 = 1'b0;
-        L2 = 1'b0;
-        L3 = 1'b0;
-        L4 = 1'b0;
-        L5 = 1'b0;
+        L0  <= 1'b1;
+        L1 <= 1'b0;
+        L2 <= 1'b0;
+        L3 <= 1'b0;
+        L4 <= 1'b0;
+        L5 <= 1'b0;
         if (plzWait > 32'd100) begin
             if(count > 32'd1000)
             begin
@@ -181,12 +181,12 @@ IntegerDivision Uno(
             plzWait <= plzWait + 1;
         end
         WAITING: begin
-        L0 = 1'b0;
-        L1 = 1'b1;
-        L2 = 1'b0;
-        L3 = 1'b0;
-        L4 = 1'b0;
-        L5 = 1'b0;
+        L0 <= 1'b0;
+        L1 <= 1'b1;
+        L2 <= 1'b0;
+        L3 <= 1'b0;
+        L4 <= 1'b0;
+        L5 <= 1'b0;
         
          if (plzWait > 32'd100) begin
             if (echo != lastecho) begin
@@ -212,12 +212,12 @@ IntegerDivision Uno(
         
         end
         COUNTTIME: begin
-        L0  = 1'b0;
-        L1 = 1'b0;
-        L2 = 1'b1;
-        L3 = 1'b0;
-        L4 = 1'b0;
-        L5 = 1'b0;
+        L0  <= 1'b0;
+        L1 <= 1'b0;
+        L2 <= 1'b1;
+        L3 <= 1'b0;
+        L4 <= 1'b0;
+        L5 <= 1'b0;
         
         if (plzWait > 32'd100) begin
         count3 <= count3 + 1;
@@ -249,12 +249,12 @@ IntegerDivision Uno(
         end
         CONVERTING: begin
         count3 <= 0;
-        L0  = 1'b0;
-        L1 = 1'b0;
-        L2 = 1'b0;
-        L3 = 1'b1;
-        L4 = 1'b0;
-        L5 = 1'b0;
+        L0  <= 1'b0;
+        L1 <= 1'b0;
+        L2 <= 1'b0;
+        L3 <= 1'b1;
+        L4 <= 1'b0;
+        L5 <= 1'b0;
         if(divdone) begin
             distance <= tempdistance;
             tempdistance2 <= tempdistance;
@@ -275,12 +275,12 @@ IntegerDivision Uno(
         
         DISPLAY: begin //OPTIONAL CASE, CHANGE PREVIOUS CASE STATE TO 0 if you dont wantt
         count6 <= 0;
-        L0  = 1'b0;
-        L1 = 1'b0;
-        L2 = 1'b0;
-        L3 = 1'b0;
-        L4 = 1'b1;
-        L5 = 1'b0;
+        L0  <= 1'b0;
+        L1 <= 1'b0;
+        L2 <= 1'b0;
+        L3 <= 1'b0;
+        L4 <= 1'b1;
+        L5 <= 1'b0;
         if(divdone1)
         begin
             
@@ -314,12 +314,12 @@ IntegerDivision Uno(
         
         end
         BUFFER: begin
-        L0  = 1'b0;
-        L1 = 1'b0;
-        L2 = 1'b0;
-        L3 = 1'b0;
-        L4 = 1'b0;
-        L5 = 1'b1;
+        L0  <= 1'b0;
+        L1 <= 1'b0;
+        L2 <= 1'b0;
+        L3 <= 1'b0;
+        L4 <= 1'b0;
+        L5 <= 1'b1;
             /*if(count4 > 'd10000000)
             begin
                 count4 <= 0;
