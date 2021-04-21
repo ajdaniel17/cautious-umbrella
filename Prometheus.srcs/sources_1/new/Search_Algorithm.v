@@ -49,10 +49,10 @@ module Search_Algorithm(
     reg Distance1ENA = 1;
     reg Distance2ENA = 0;
     reg switch = 0;
-    reg [31:0]lastDistance = 0;
+    //reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
-    reg [31:0] target = 200;
-    reg [31:0] trueDistance = 0;
+    reg [31:0] target = 50;
+    //reg [31:0] trueDistance = 0;
     reg debug = 0;
     reg [3:0] state = 1;
     reg aligned = 1;
@@ -88,7 +88,7 @@ UltraSonic_DistanceSensor FindDistance1(
 .led4(led4),
 .led5(led5),
 .led12(led12),
-.btnU(Distance1ENA),
+.btnU(1'b1),
 .clock(clock),
 .echo(JA5),
 .trigger(JA4),
@@ -101,7 +101,7 @@ UltraSonic_DistanceSensor FindDistance1(
 );
 
 HyperSonic FindDistance2(
-.btnU(Distance2ENA),
+.btnU(1'b1),
 .clock(clock),
 .echo(echo2),
 .trigger(trigger2),
@@ -111,7 +111,7 @@ HyperSonic FindDistance2(
 .D3(D3s3),
 .D4(D4s3),  
 .done(distance2Done)
-);  
+); 
 
 LightYagami Left_Side(
     .signalA(Encoder1A),
@@ -188,15 +188,15 @@ end
 
 end
 
-always @ (posedge clock) begin
+/*always @ (posedge clock) begin
 if(distanceDone)
     trueDistance <= Distance1;
     previousShortestDistance <= shortestDistance;
-end
+end*/
 
-always @ (posedge clock) begin
+/*always @ (posedge clock) begin
     lastDistance <= trueDistance;
-end
+end*/
 
 always @ (posedge clock) begin
 
@@ -245,7 +245,7 @@ if(turn) begin
     width2 <= 650000;
     enA <= temp_PWM;
     enB <= temp_PWM2;
-    if(turncounter > 200000000) begin
+    if(turncounter > 175000000) begin
     turncounter <= 0;
     turndone <= 1; 
     end
@@ -274,11 +274,10 @@ end
     end
     ALIGN:
     begin    
-   
-    enA <= temp_PWM;
-    enB <= temp_PWM2;
     
     if(start) begin
+        enA <= temp_PWM;
+        enB <= temp_PWM2;
         width1 <= 450000;
         width2 <= 450000;
         if(IRdone1==1 & IRdone2==1) begin
@@ -334,12 +333,16 @@ end
     end
     
     if(align2) begin
+    enA <= temp_PWM;
+    enB <= temp_PWM2;
     width1 <= 380000;
     width2 <= 380000;
     if(firstturn == 1) begin
         if(IRcount1 > 1666666) begin
             in1 <= 0;
             in2 <= 0;
+            in3 <= 0;
+            in4 <= 0;
             turn <= 1;
             align2 <= 0;
         end
@@ -351,12 +354,16 @@ end
             IRcount1 <= 0;
             in1 <= 1;
             in2 <= 0;
+            in3 <= 0;
+            in4 <= 0;
         end
         
     end
     
     if (firstturn == 2) begin
         if(IRcount2 > 1666666) begin
+            in1 <= 0;
+            in2 <= 0;
             in3 <= 0;
             in4 <= 0;
             turn <= 1;
@@ -367,6 +374,8 @@ end
         end
         else
         begin
+            in1 <= 0;
+            in2 <= 0;
             in3 <= 0;
             in4 <= 1;
             IRcount2 <= 0;
@@ -376,139 +385,59 @@ end
     
       if(turndone) begin
       
-      end
-//    if(turn) begin
+        if(Distance1 > (target+200)) begin
+            width1 <= 866666;
+            width2 <= 866666;
+        end
+        else if ((Distance1 < (target+50)) & (Distance1 > (target-50))) begin
+            width1 <= 250000;
+            width2 <= 250000;
+        end
+        else if ((Distance1 < (target+100))) begin
+            width1 <= 500000;
+            width2 <= 500000;
+        end
         
-//        if(tic_count_L < 1800) begin
-//                in1 <= 1;
-//                in2 <= 0;
-//                width1 <= 500000;
-//            end
-//            else begin
-//               in1 <= 0;
-//               in2 <= 0;
-//               doneL <= 1;
-//               //turn <= 1;
-//               //aligned <= 0;
-//            end
-            
-//            if(tic_count_R > -1700) begin
-//               in3 <= 1;
-//               in4 <= 0;
-//               width2 <= 500000;
-//               //width2 <= 500000;
-//            end
-//            else begin
-//               in3 <= 0;
-//               in4 <= 0;
-//               doneR <= 1;
-//               //turn <= 1;
-//               //aligned <= 0;
-//               end
-  
-//            if((doneR == 1 || doneL == 1)) begin
-//                //stuff 
-//            end
-//    end
-    
+        if(Distance1 < (target-10)) begin
+           counter3 = 0;
+           in1 = 1;
+           in2 = 0;
+           in3 = 0;
+           in4 = 1;
+           enA = temp_PWM;
+           enB = temp_PWM2;
+       end
+       else if (Distance1 > (target+10)) begin
+           counter3 = 0;
+           in1 = 0;
+           in2 = 1;
+           in3 = 1;
+           in4 = 0;
+           enA = temp_PWM;
+           enB = temp_PWM2;
+       end
+       else begin
+           turndone <= 0;
+           counter3 = 0;
+           enA = 0;
+           enB = 0;
+       end
     end
-        /*if(~turn) begin
-
-            if(shortestDistance > trueDistance & trueDistance > 100)
-                shortestDistance <= trueDistance;
-                
-            //if(tic_count_R < 10000 & tic_count_L < 10000) begin
-            
-            if(tic_count_L < 1800) begin
-                in1 <= 1;
-                in2 <= 0;
-                width1 <= 420000;
-            end
-            else begin
-               in1 <= 0;
-               in2 <= 0;
-               doneL <= 1;
-               //turn <= 1;
-               //aligned <= 0;
-            end
-            
-            if(tic_count_R > -1700) begin
-               in3 <= 1;
-               in4 <= 0;
-               width2 <= 420000;
-               //width2 <= 500000;
-            end
-            else begin
-               in3 <= 0;
-               in4 <= 0;
-               doneR <= 1;
-               //turn <= 1;
-               //aligned <= 0;
-               end
                
-            
-            if((doneR == 1 || doneL == 1)) begin
-                
-            end
-
-           end*/
-             
-               
-        
-                
-        /*if(~aligned) begin
-            if((trueDistance > (shortestDistance + 20)) || (trueDistance<100)) begin
-               in1 <= 0;
-               in2 <= 1;
-               in3 <= 0;
-               in4 <= 1;
-               width1 <= 420000;
-               width2 <= 420000;
-            end
-            else
-            begin
-               in1 <= 0;
-               in2 <= 0;
-               in3 <= 0;
-               in4 <= 0;
-               aligned = 1;
-            end
-            end*/
-//            end
-//            if(startalign)
-//            begin
-//               shortestDistance <= trueDistance;
-               
-//               startalign = 0;
-//            end
-//            if(lastDistance > trueDistance) begin
-//               in1 <= 1;
-//               in2 <= 0;
-//               in3 <= 1;
-//               in4 <= 0;
-//            end
-//            if(lastDistance < trueDistance) begin
-//               in1 <= 0;
-//               in2 <= 1;
-//               in3 <= 0;
-//               in4 <= 1;
-//            end
-            
-//            if(shortestDistance < trueDistance)
-//                shortestDistance <= trueDistance;
-//            
-//            if(counter > 10000000)
-//                begin
-//                counter <= 0;
-//                end
-//            else
-//                counter <= counter +1; 
-                
+end
+      
+       /*if (Distance1 < 50 ) begin
+           turndone <= 0;
+           counter3 = 0;
+           enA = 0;
+           enB = 0;
+       end*/
+       
           
 
     
     endcase
-        if(debug) begin
+        /*if(debug) begin
                 if(trueDistance  > (target+200) || trueDistance  < (target- 200)) begin
                 width1 <= 866666;
                 end
@@ -565,7 +494,7 @@ end
               //else begin 
               //  counter3 = counter3 + 1;
               //end
-              end
+              end*/
 end
 
 

@@ -141,7 +141,7 @@ IntegerDivision Uno(
             count <= 0;
             count2 <= 0;
             count3 <= 0;
-            distance <= 0;
+            //distance <= 0;
         end
             
         
@@ -349,7 +349,7 @@ IntegerDivision Uno(
             if(count5 > 32'd1666666) begin
                 L12 = 0;
                 count5 <= 0;
-                distance = 0;
+                //distance = 0;
                 state <= START;
                 trigger <= 1;
             end
