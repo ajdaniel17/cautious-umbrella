@@ -427,15 +427,18 @@ end
     end
     
       if(turndone) begin
+        
+        enA <= temp_PWM;
+        enB <= temp_PWM2;
       
-        if(Distance1 > (target+200)) begin
+        if(trueDistance1 > (target+200)) begin
             if(trueDistance2 < 80) begin
-            width1 <= 500000;
+            width1 <= 300000;
             width2 <= 866666;
             end
-            if(Distance2 > 100) begin
+            else if(trueDistance2 > 100) begin
             width1 <= 866666;
-            width2 <= 500000;
+            width2 <= 300000;
             end
             else begin
             width1 <= 866666;
@@ -454,27 +457,27 @@ end
 //              width2 <= 866666;
 //            end
         end
-        else if ((Distance1 < (target+50)) & (Distance1 > (target-50))) begin
+        else if ((trueDistance1 < (target+50)) & (trueDistance1 > (target-50))) begin
             width1 <= 250000;
             width2 <= 250000;
         end
-        else if ((Distance1 < (target+100))) begin
-//        if(Distance2 > 100) begin
-//              width1 <= 400000;
-//              width2 <= 500000;
-//            end
-//            else if(Distance2 < 90) begin
-//              width1 <= 500000;
-//              width2 <= 400000;
-//            end
-//            else begin
+        else if ((trueDistance1 < (target+100))) begin
+        if(trueDistance2 > 100) begin
+              width1 <= 300000;
+              width2 <= 500000;
+            end
+            else if(trueDistance2 < 90) begin
+              width1 <= 500000;
+              width2 <= 300000;
+            end
+            else begin
               width1 <= 500000;
               width2 <= 500000;
-//            end
+            end
 
         end
         
-        if(Distance1 < (target-10)) begin
+        if(trueDistance1 < (target-10)) begin
            counter3 <= 0;
            in1 <= 1;
            in2 <= 0;
@@ -483,7 +486,7 @@ end
            enA <= temp_PWM;
            enB <= temp_PWM2;
        end
-       else if (Distance1 > (target+10)) begin
+       else if (trueDistance1 > (target+10)) begin
            counter3 <= 0;
            in1 <= 0;
            in2 <= 1;
