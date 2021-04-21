@@ -26,13 +26,13 @@ module UltraSonic_DistanceSensor(
     output led0,led1,led2,led3,led4,led5,led12,
     output reg trigger = 0,
     output reg [31:0] distance = 0,
-    output reg [31:0] timecount = 0,
-    input [31:0] tempdistance,
-    input divdone,
-    output reg lastecho,
+    //output reg [31:0] timecount = 0,
+    //wire [31:0] tempdistance,
+    //wire divdone,
+    //output reg lastecho,
     output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
-    input divdone1,divdone2,divdone3,divdone4,   
-    input [31:0] tempD1,tempD2,tempD3,tempD4,
+    //wire divdone1,divdone2,divdone3,divdone4,   
+    //wire [31:0] tempD1,tempD2,tempD3,tempD4,
     output reg done=0
     );
     
@@ -43,7 +43,16 @@ module UltraSonic_DistanceSensor(
                DISPLAY = 4'd5,
                BUFFER = 4'd6,
                SIXTYHZ = 4'd7;
-    //reg DIVenable = 0;           
+    //reg DIVenable = 0;   
+    
+    wire divdone;
+    wire [31:0] tempdistance;
+    wire divdone1,divdone2,divdone3,divdone4;
+    wire [31:0] tempD1,tempD2,tempD3,tempD4;
+    
+    reg lastecho;
+    reg [31:0] timecount = 0;
+            
     reg [3:0]state = BUFFER;
     reg [3:0]lastState;
     reg [31:0] count = 0;
@@ -345,9 +354,9 @@ IntegerDivision Uno(
         end
         
         SIXTYHZ: begin
-            L12 = 1;
+            L12 <= 1;
             if(count5 > 32'd1666666) begin
-                L12 = 0;
+                L12 <= 0;
                 count5 <= 0;
                 //distance = 0;
                 state <= START;

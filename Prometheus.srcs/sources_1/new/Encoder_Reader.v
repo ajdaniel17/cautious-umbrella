@@ -23,11 +23,16 @@
 module Encoder_Reader(
     input signalA,signalB,clock,
     output reg signed [31:0] tic_count = 0,
-    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
-    input divdone1,divdone2,divdone3,divdone4,   
-    input [15:0] tempD1,tempD2,tempD3,tempD4,
-    input reset
+    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0
+    //wire divdone1,divdone2,divdone3,divdone4,   
+    //wire [31:0] tempD1,tempD2,tempD3,tempD4,
+    //wire reset
         );
+        
+    wire divdone1,divdone2,divdone3,divdone4;
+    wire [31:0] tempD1,tempD2,tempD3,tempD4;
+    wire reset;
+        
     wire [1:0] Combined_Signal = {signalA,signalB};
     wire signed[31:0] bridge1,bridge2,bridge3;
     reg [1:0]lastCS = 00;
@@ -101,12 +106,12 @@ IntegerDivision Uno(
                 2'd1:
                 begin
                     tic_count <= tic_count - $signed(1);
-                    DIVenable1 = 1; 
+                    DIVenable1 <= 1; 
                 end
                 2'd2:
                 begin
                     tic_count <= tic_count + $signed(1);
-                    DIVenable1 = 1;
+                    DIVenable1 <= 1;
                 end
                 endcase
             end
@@ -116,12 +121,12 @@ IntegerDivision Uno(
                 2'd0:
                 begin
                     tic_count <= tic_count + $signed(1);
-                    DIVenable1 = 1;
+                    DIVenable1 <= 1;
                 end
                 2'd3:
                 begin
                     tic_count <= tic_count - $signed(1);
-                    DIVenable1 = 1;
+                    DIVenable1 <= 1;
                 end
                 endcase
             end
@@ -131,12 +136,12 @@ IntegerDivision Uno(
                 2'd0:
                 begin
                     tic_count <= tic_count - $signed(1);
-                    DIVenable1 = 1;
+                    DIVenable1 <= 1;
                 end
                 2'd3:
                 begin
                    tic_count <= tic_count + $signed(1);
-                   DIVenable1 = 1;
+                   DIVenable1 <= 1;
                 end
           
                 endcase
@@ -147,12 +152,12 @@ IntegerDivision Uno(
                 2'd1:
                 begin
                     tic_count <= tic_count + $signed(1);
-                    DIVenable1 = 1;
+                    DIVenable1 <= 1;
                 end
                 2'd2:
                 begin
                     tic_count <= tic_count - $signed(1);
-                    DIVenable1 = 1;
+                    DIVenable1 <= 1;
                 end
          
                 endcase
@@ -164,29 +169,29 @@ IntegerDivision Uno(
             
         if(divdone1)
         begin 
-            D1 = tempD1;
-            DIVenable1 = 0;
-            DIVenable2 = 1;
+            D1 <= tempD1;
+            DIVenable1 <= 0;
+            DIVenable2 <= 1;
         end
         
         if(divdone2)
         begin 
-            D2 = tempD2;
-            DIVenable2 = 0;
-            DIVenable3 = 1;
+            D2 <= tempD2;
+            DIVenable2 <= 0;
+            DIVenable3 <= 1;
         end
         
         if(divdone3)
         begin 
-            D3 = tempD3;
-            DIVenable3 = 0;
-            DIVenable4 = 1;
+            D3 <= tempD3;
+            DIVenable3 <= 0;
+            DIVenable4 <= 1;
         end
         
         if(divdone4)
         begin 
-            D4 = tempD4;
-            DIVenable4 = 0;
+            D4 <= tempD4;
+            DIVenable4 <= 0;
         end
    
             

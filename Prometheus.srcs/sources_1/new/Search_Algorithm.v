@@ -21,22 +21,33 @@
 
 
 module Search_Algorithm(
-    input clock,JA5,JA4,echo2,trigger2,
+    input clock,
+    //input JA5,JA4,echo2,trigger2,
+    input JA5, echo2,
+    output JA4, trigger2,
     input S0,S1,S2,S3,
-    input [31:0] Distance1,
-    input [31:0] Distance2,
+    //wire [31:0] Distance1,
+    //wire [31:0] Distance2,
     output reg in1,in2,in3,in4,enA,enB,
-    input led0,led1,led2,led3,led4,led5,led12,
+    //wire led0,led1,led2,led3,led4,led5,led12,
     output LED0, LED1, LED2, LED3, LED4, LED5, LED12,
-    input [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,D1s3,D2s3,D3s3,D4s3,
+    //wire [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,D1s3,D2s3,D3s3,D4s3,
     output reg [4:0] D1o,D2o,D3o,D4o,
-    input distanceDone,distance2Done,
-    input signed [15:0] tic_count_L,tic_count_R,
+    //wire distanceDone,distance2Done,
+    //wire signed [31:0] tic_count_L,tic_count_R,
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     input IRSense1, IRSense2
     );
     localparam IDLE = 0,
                ALIGN = 1;
+    
+    wire [31:0] Distance1;
+    wire [31:0] Distance2;
+    wire led0,led1,led2,led3,led4,led5,led12;
+    wire led0_2,led1_2,led2_2,led3_2,led4_2,led5_2,led12_2;
+    wire [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,D1s3,D2s3,D3s3,D4s3;
+    wire distanceDone,distance2Done;
+    wire signed [31:0] tic_count_L,tic_count_R;
     
     reg [21:0] counter = 0;
     reg [31:0] counter2 = 0;
@@ -46,13 +57,14 @@ module Search_Algorithm(
     reg [31:0] width2;
     reg temp_PWM = 0;
     reg temp_PWM2 = 0;
-    reg Distance1ENA = 1;
-    reg Distance2ENA = 0;
+    //reg Distance1ENA = 1;
+    //reg Distance2ENA = 0;
     reg switch = 0;
     //reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
     reg [31:0] target = 50;
-    //reg [31:0] trueDistance = 0;
+    reg [31:0] trueDistance1 = 0;
+    reg [31:0] trueDistance2 = 0;
     reg debug = 0;
     reg [3:0] state = 1;
     reg aligned = 1;
@@ -72,13 +84,17 @@ module Search_Algorithm(
     reg [31:0] turncounter = 0;
     reg turndone = 0;
     
-    assign LED0 = led0;
-    assign LED1 = led1;
-    assign LED2 = led2;
-    assign LED3 = led3;
-    assign LED4 = led4;
-    assign LED5 = led5;
-    assign LED12 = led12;
+    reg trueled0,trueled1,trueled2,trueled3,trueled4,trueled5,trueled12;
+    
+    //assign truedistance1 = Distance1;
+    
+    assign LED0 = trueled0;
+    assign LED1 = trueled1;
+    assign LED2 = trueled2;
+    assign LED3 = trueled3;
+    assign LED4 = trueled4;
+    assign LED5 = trueled5;
+    assign LED12 = trueled12;
     
 UltraSonic_DistanceSensor FindDistance1(
 .led0(led0),
@@ -100,7 +116,14 @@ UltraSonic_DistanceSensor FindDistance1(
 .done(distanceDone)
 );
 
-HyperSonic FindDistance2(
+UltraSonic_DistanceSensor SecondFindDistance(
+.led0(led0_2),
+.led1(led1_2),
+.led2(led2_2),
+.led3(led3_2),
+.led4(led4_2),
+.led5(led5_2),
+.led12(led12_2),
 .btnU(1'b1),
 .clock(clock),
 .echo(echo2),
@@ -111,9 +134,23 @@ HyperSonic FindDistance2(
 .D3(D3s3),
 .D4(D4s3),  
 .done(distance2Done)
-); 
+);
 
-LightYagami Left_Side(
+
+/*HyperSonic FindDistance2(
+.btnU(1'b1),
+.clock(clock),
+.echo(echo2),
+.trigger(trigger2),
+.distance2(Distance2),
+.D1(D1s3),
+.D2(D2s3),
+.D3(D3s3),
+.D4(D4s3),  
+.done(distance2Done)
+); */
+
+Encoder_Reader Left_Side(
     .signalA(Encoder1A),
     .signalB(Encoder1B),
     .clock(clock),
@@ -121,15 +158,7 @@ LightYagami Left_Side(
     .D1(D1s1),
     .D2(D2s1),
     .D3(D3s1),
-    .D4(D4s1),  
-    .divdone1(),
-    .divdone2(),
-    .divdone3(),
-    .divdone4(),   
-    .tempD1(),
-    .tempD2(),
-    .tempD3(),
-    .tempD4()
+    .D4(D4s1)
     );
     
 Encoder_Reader Right_Side(
@@ -140,15 +169,7 @@ Encoder_Reader Right_Side(
     .D1(D1s2),
     .D2(D2s2),
     .D3(D3s2),
-    .D4(D4s2),  
-    .divdone1(),
-    .divdone2(),
-    .divdone3(),
-    .divdone4(),   
-    .tempD1(),
-    .tempD2(),
-    .tempD3(),
-    .tempD4()
+    .D4(D4s2)
     );
     
     
@@ -156,34 +177,48 @@ Encoder_Reader Right_Side(
 
 always @ (posedge clock) begin
 if(S0) begin
-D1o = D1s0;
-D2o = D2s0;
-D3o = D3s0;
-D4o = D4s0;
+trueled0 <= led0;
+trueled1 <= led1;
+trueled2 <= led2;
+trueled3 <= led3;
+trueled4 <= led4;
+trueled5 <= led5;
+trueled12 <= led12;
+D1o <= D1s0;
+D2o <= D2s0;
+D3o <= D3s0;
+D4o <= D4s0;
 end
 else if (S1) begin
-D1o = D1s1;
-D2o = D2s1;
-D3o = D3s1;
-D4o = D4s1;
+D1o <= D1s1;
+D2o <= D2s1;
+D3o <= D3s1;
+D4o <= D4s1;
 end 
 else if (S2) begin
-D1o = D1s2;
-D2o = D2s2;
-D3o = D3s2;
-D4o = D4s2;
+D1o <= D1s2;
+D2o <= D2s2;
+D3o <= D3s2;
+D4o <= D4s2;
 end
 else if(S3) begin
-D1o = D1s3;
-D2o = D2s3;
-D3o = D3s3;
-D4o = D4s3;
+trueled0 <= led0_2;
+trueled1 <= led1_2;
+trueled2 <= led2_2;
+trueled3 <= led3_2;
+trueled4 <= led4_2;
+trueled5 <= led5_2;
+trueled12 <= led12_2;
+D1o <= D1s3;
+D2o <= D2s3;
+D3o <= D3s3;
+D4o <= D4s3;
 end
 else begin 
-D1o = 0;
-D2o = 0;
-D3o = 0;
-D4o = 0;
+D1o <= 0;
+D2o <= 0;
+D3o <= 0;
+D4o <= 0;
 end
 
 end
@@ -199,13 +234,21 @@ end*/
 end*/
 
 always @ (posedge clock) begin
-
+    
+    if(distanceDone) begin
+        trueDistance1 <= Distance1;
+    end
+    if(distance2Done) begin
+        trueDistance2 <= Distance2;
+    end
+    
+    
                 if (counter > 1666666)
                     counter <= 0;
                 else
                     counter <= counter +1;
                     
-                if(counter < width1)
+                if(counter < width1 )
                    temp_PWM <= 1;
                 else 
                    temp_PWM <= 0;
@@ -220,24 +263,24 @@ always @ (posedge clock) begin
                 else 
                    temp_PWM2 <= 0;    
                    
-               if (counter2 > 2000) begin
-                 Distance1ENA <= 1;
-                 counter2 <= 0;       
-               end
-               else if (distanceDone)begin
-                 Distance1ENA <= 0;
-                 Distance2ENA <= 1;
-               end
-               else if(distance2Done) begin
-               Distance2ENA <= 0;
-               counter2 <= 0;
-               end 
-               else if (distanceDone & distance2Done) begin
-                counter2 <= counter2 + 1;
-               end
-               else begin
-                counter2 <= 0;
-               end
+//               if (counter2 > 2000) begin
+//                 Distance1ENA <= 1;
+//                 counter2 <= 0;       
+//               end
+//               else if (distanceDone)begin
+//                 Distance1ENA <= 0;
+//                 Distance2ENA <= 1;
+//               end
+//               else if(distance2Done) begin
+//               Distance2ENA <= 0;
+//               counter2 <= 0;
+//               end 
+//               else if (distanceDone & distance2Done) begin
+//                counter2 <= counter2 + 1;
+//               end
+//               else begin
+//                counter2 <= 0;
+//               end
                
                
 if(turn) begin
@@ -386,41 +429,74 @@ end
       if(turndone) begin
       
         if(Distance1 > (target+200)) begin
+            if(trueDistance2 < 80) begin
+            width1 <= 500000;
+            width2 <= 866666;
+            end
+            if(Distance2 > 100) begin
+            width1 <= 866666;
+            width2 <= 500000;
+            end
+            else begin
             width1 <= 866666;
             width2 <= 866666;
+            end
+//            if(Distance2 > 100) begin
+//              width1 <= 700000;
+//              width2 <= 866666;
+//            end
+//            else if(Distance2 < 90) begin
+//              width1 <= 866666;
+//              width2 <= 700000;
+//            end
+//            else begin
+//              width1 <= 866666;
+//              width2 <= 866666;
+//            end
         end
         else if ((Distance1 < (target+50)) & (Distance1 > (target-50))) begin
             width1 <= 250000;
             width2 <= 250000;
         end
         else if ((Distance1 < (target+100))) begin
-            width1 <= 500000;
-            width2 <= 500000;
+//        if(Distance2 > 100) begin
+//              width1 <= 400000;
+//              width2 <= 500000;
+//            end
+//            else if(Distance2 < 90) begin
+//              width1 <= 500000;
+//              width2 <= 400000;
+//            end
+//            else begin
+              width1 <= 500000;
+              width2 <= 500000;
+//            end
+
         end
         
         if(Distance1 < (target-10)) begin
-           counter3 = 0;
-           in1 = 1;
-           in2 = 0;
-           in3 = 0;
-           in4 = 1;
-           enA = temp_PWM;
-           enB = temp_PWM2;
+           counter3 <= 0;
+           in1 <= 1;
+           in2 <= 0;
+           in3 <= 0;
+           in4 <= 1;
+           enA <= temp_PWM;
+           enB <= temp_PWM2;
        end
        else if (Distance1 > (target+10)) begin
-           counter3 = 0;
-           in1 = 0;
-           in2 = 1;
-           in3 = 1;
-           in4 = 0;
-           enA = temp_PWM;
-           enB = temp_PWM2;
+           counter3 <= 0;
+           in1 <= 0;
+           in2 <= 1;
+           in3 <= 1;
+           in4 <= 0;
+           enA <= temp_PWM;
+           enB <= temp_PWM2;
        end
        else begin
            turndone <= 0;
-           counter3 = 0;
-           enA = 0;
-           enB = 0;
+           counter3 <= 0;
+           enA <= 0;
+           enB <= 0;
        end
     end
                

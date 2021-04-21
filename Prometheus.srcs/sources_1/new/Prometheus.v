@@ -94,7 +94,6 @@ Search_Algorithm Brain(
 .JA4(trigger1),
 .echo2(echo2),
 .trigger2(trigger2),
-.Distance1(),
 .S0(in0),
 .S1(in1),
 .S2(in2),
