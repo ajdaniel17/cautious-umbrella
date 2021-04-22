@@ -74,7 +74,7 @@ module Search_Algorithm(
     reg [31:0] trueDistance1 = 0;
     reg [31:0] trueDistance2 = 0;
     reg debug = 0;
-    reg [3:0] state = 0;
+    reg [3:0] state = 1;
     reg aligned = 1;
     reg startalign = 1;
     reg [31:0] shortestDistance = 1000000000;
@@ -482,11 +482,11 @@ end
         enB <= temp_PWM2;
       
         if(trueDistance1 > (target+200)) begin
-            if(trueDistance2 < 87) begin
+            if(trueDistance2 < 89) begin
             width1 <= 400000;
             width2 <= 700000;
             end
-            else if(trueDistance2 > 93) begin
+            else if(trueDistance2 > 91) begin
             width1 <= 700000;
             width2 <= 400000;
             end
@@ -512,11 +512,11 @@ end
             width2 <= 300000;
         end
         else if ((trueDistance1 < (target+100))) begin
-            if(trueDistance2 < 87) begin
+            if(trueDistance2 < 88) begin
               width1 <= 500000;
               width2 <= 300000;
             end
-            else if(trueDistance2 > 93) begin
+            else if(trueDistance2 > 92) begin
               width1 <= 300000;
               width2 <= 500000;
             end
@@ -578,17 +578,17 @@ end
         
         if(lengthstart) begin
              if(trueDistance1 > (target+200)) begin
-                if(trueDistance2 < (target2-3)) begin
-                    width1 <= 400000;
-                    width2 <= 700000;
+                if(trueDistance2 < (target2-1)) begin
+                    width1 <= 500000;
+                    width2 <= 800000;
                 end
-                else if(trueDistance2 > (target2+3)) begin
-                    width1 <= 700000;
-                    width2 <= 400000;
+                else if(trueDistance2 > (target2+2)) begin
+                    width1 <= 750000;
+                    width2 <= 500000;
                 end
                 else begin
-                    width1 <= 700000;
-                    width2 <= 700000;
+                    width1 <= 800000;
+                    width2 <= 800000;
                 end
             end
             else if ((trueDistance1 < (target+50)) & (trueDistance1 > (target-50))) begin
@@ -596,13 +596,13 @@ end
                 width2 <= 250000;
             end
             else if ((trueDistance1 < (target+100))) begin
-                if(trueDistance2 < (target2-3)) begin
-                    width1 <= 500000;
+                if(trueDistance2 < (target2-2)) begin
+                    width1 <= 60000;
                     width2 <= 300000;
                 end
-                else if(trueDistance2 > (target+3)) begin
+                else if(trueDistance2 > (target+4)) begin
                     width1 <= 300000;
-                    width2 <= 500000;
+                    width2 <= 550000;
                 end
                 else begin
                     width1 <= 500000;
