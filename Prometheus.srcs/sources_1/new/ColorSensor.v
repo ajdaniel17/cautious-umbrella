@@ -22,12 +22,17 @@
 
 module ColorSensor(
     input clock,
-    input colorinput,frqdone,divdone,
+    input colorinput,
+    //wire frqdone,divdone,
     output s2,s3,
-    input[19:0] FRQ,
-    input[31:0] tempquo,
+    //wire[19:0] FRQ,
+    //wire [31:0] tempquo,
     output RED,GREEN,BLUE
     );
+    
+    wire[19:0] FRQ;
+    wire [31:0] tempquo;
+    wire frqdone,divdone;
     
     reg FRQenable = 1;
     reg DIVenable = 0;

@@ -23,15 +23,15 @@
 module Encoder_Reader(
     input signalA,signalB,clock,
     output reg signed [31:0] tic_count = 0,
-    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0
+    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
     //wire divdone1,divdone2,divdone3,divdone4,   
     //wire [31:0] tempD1,tempD2,tempD3,tempD4,
-    //wire reset
+    input reset
         );
         
     wire divdone1,divdone2,divdone3,divdone4;
     wire [31:0] tempD1,tempD2,tempD3,tempD4;
-    wire reset;
+    //wire reset;
         
     wire [1:0] Combined_Signal = {signalA,signalB};
     wire signed[31:0] bridge1,bridge2,bridge3;
@@ -90,12 +90,10 @@ IntegerDivision Uno(
     
     always @ (posedge clock)
     begin
+    
+        
         if (reset) begin
             tic_count <= 0;
-            D1 <= 0;
-            D2 <= 0;
-            D3 <= 0;
-            D4 <= 0;
         end
         
         else begin
