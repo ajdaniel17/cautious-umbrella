@@ -66,10 +66,12 @@ module Search_Algorithm(
     reg switch = 0;
     //reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
-    reg [31:0] target = 40;
+    reg [31:0] target = 50;
     reg [31:0] target2 = 45;
     reg [3:0] turnNUM = 0;
     reg lengthstart = 0;
+    reg incrementONCE = 1;
+    reg increment2ONCE = 1;
     
     reg [31:0] trueDistance1 = 0;
     reg [31:0] trueDistance2 = 0;
@@ -481,12 +483,12 @@ end
         enA <= temp_PWM;
         enB <= temp_PWM2;
       
-        if(trueDistance1 > (target+200)) begin
-            if(trueDistance2 < 89) begin
+        if(trueDistance1 > (target+125)) begin
+            if(trueDistance2 < 87) begin
             width1 <= 400000;
             width2 <= 700000;
             end
-            else if(trueDistance2 > 91) begin
+            else if(trueDistance2 > 93) begin
             width1 <= 700000;
             width2 <= 400000;
             end
@@ -507,18 +509,18 @@ end
 //              width2 <= 866666;
 //            end
         end
-        else if ((trueDistance1 < (target+50)) & (trueDistance1 > (target-50))) begin
+        else if ((trueDistance1 < (target+75)) & (trueDistance1 > (target-75))) begin
             width1 <= 300000;
             width2 <= 300000;
         end
-        else if ((trueDistance1 < (target+100))) begin
-            if(trueDistance2 < 88) begin
-              width1 <= 500000;
-              width2 <= 300000;
-            end
-            else if(trueDistance2 > 92) begin
+        else if ((trueDistance1 < (target+125))) begin
+            if(trueDistance2 < 87) begin
               width1 <= 300000;
               width2 <= 500000;
+            end
+            else if(trueDistance2 > 93) begin
+              width1 <= 500000;
+              width2 <= 300000;
             end
             else begin
               width1 <= 500000;
@@ -574,35 +576,57 @@ end
         if(turndone) begin
             turndone <= 0;
             lengthstart <= 1;
+            
+            if(turnNUM == 5) begin
+                 //turnNUM <= 1;
+                 if(incrementONCE) begin
+                 increment2ONCE <= 1;
+                 incrementONCE <= 0;
+                 target <= target + 60;
+                 turnNUM <= 1;
+                 end
+             end
+             if(turnNUM == 2) begin
+                if(increment2ONCE) begin
+                incrementONCE <= 1;
+                increment2ONCE <= 0;
+                target2 <= target2 + 60;
+                end
+             end
+            
         end
         
         if(lengthstart) begin
-             if(trueDistance1 > (target+200)) begin
-                if(trueDistance2 < (target2-1)) begin
+        
+             if(trueDistance1 > (target+125)) begin
+                if(trueDistance2 < (target2-4)) begin
                     width1 <= 500000;
                     width2 <= 800000;
                 end
-                else if(trueDistance2 > (target2+2)) begin
-                    width1 <= 750000;
+                /*else if(trueDistance2 > (target2-4) & trueDistance2 < (target2)) begin
+                
+                end*/
+                else if(trueDistance2 > (target2+4)) begin
+                    width1 <= 700000;
                     width2 <= 500000;
                 end
                 else begin
-                    width1 <= 800000;
-                    width2 <= 800000;
+                    width1 <= 700000;
+                    width2 <= 700000;
                 end
             end
-            else if ((trueDistance1 < (target+50)) & (trueDistance1 > (target-50))) begin
-                width1 <= 250000;
-                width2 <= 250000;
+            else if ((trueDistance1 < (target+75)) & (trueDistance1 > (target-75))) begin
+                width1 <= 300000;
+                width2 <= 300000;
             end
-            else if ((trueDistance1 < (target+100))) begin
-                if(trueDistance2 < (target2-2)) begin
-                    width1 <= 60000;
-                    width2 <= 300000;
+            else if ((trueDistance1 < (target+125))) begin
+                if(trueDistance2 < (target2-3)) begin
+                    width1 <= 350000;
+                    width2 <= 600000;
                 end
-                else if(trueDistance2 > (target+4)) begin
-                    width1 <= 300000;
-                    width2 <= 550000;
+                else if(trueDistance2 > (target+3)) begin
+                    width1 <= 600000;
+                    width2 <= 350000;
                 end
                 else begin
                     width1 <= 500000;
@@ -610,7 +634,7 @@ end
                 end
             end
             
-            if(trueDistance1 < (target-10)) begin
+            /*if(trueDistance1 < (target-10)) begin
                counter3 <= 0;
                in1 <= 1;
                in2 <= 0;
@@ -619,8 +643,8 @@ end
                enA <= temp_PWM;
                enB <= temp_PWM2;
                //turndone <= 0;
-           end
-           else if (trueDistance1 > (target+10)) begin
+           end*/
+           if (trueDistance1 > (target+10)) begin
                counter3 <= 0;
                //turndone <= 0;
                in1 <= 0;
