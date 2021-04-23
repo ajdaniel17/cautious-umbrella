@@ -47,9 +47,9 @@ module ColorSensor(
     reg[16:0] divToStoreCount; 
     reg[16:0] frqToDivCount;
     reg doneWithDiv=0,enableStore2=0,doneWithReadFrq=0,turnOnDiv=0;
-    reg [6:0] redThresh = 7'd55;
-    reg [6:0] blueThresh = 7'd45;
-    reg [6:0] greenThresh = 7'd40;
+    reg [6:0] redThresh = 7'd50;
+    reg [6:0] blueThresh = 7'd40;
+    reg [6:0] greenThresh = 7'd35;
     
 ReadFrequency Readthis(
      .CLK(clock),        

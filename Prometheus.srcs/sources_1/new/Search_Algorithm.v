@@ -30,13 +30,15 @@ module Search_Algorithm(
     //wire [31:0] Distance2,
     output reg in1,in2,in3,in4,enA,enB,
     //wire led0,led1,led2,led3,led4,led5,led12,
-    output LED0, LED1, LED2, LED3, LED4, LED5, LED12,
+    output LED0, LED1, LED2, LED3, LED4, LED5, LED7, LED8, LED9, LED12,
     //wire [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,D1s3,D2s3,D3s3,D4s3,
     output reg [4:0] D1o,D2o,D3o,D4o,
     //wire distanceDone,distance2Done,
     //wire signed [31:0] tic_count_L,tic_count_R,
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
-    input IRSense1, IRSense2
+    input IRSense1, IRSense2,
+    input colorinput,
+    output colors2, colors3
     );
     localparam IDLE = 0,
                ALIGN = 1,
@@ -49,10 +51,11 @@ module Search_Algorithm(
     wire [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,D1s3,D2s3,D3s3,D4s3;
     wire distanceDone,distance2Done;
     wire signed [31:0] tic_count_L,tic_count_R;
+    wire RED, GREEN, BLUE;
     
     reg reset1 = 0, reset2 = 0;
     reg [31:0] resetCount = 0;
-    
+    reg [31:0] Distance2Pre;
     reg [21:0] counter = 0;
     reg [31:0] counter2 = 0;
     reg [31:0] counter3 = 0;
@@ -66,17 +69,23 @@ module Search_Algorithm(
     reg switch = 0;
     //reg [31:0]lastDistance = 0;
     reg ANGRYFLAG = 0;
-    reg [31:0] target = 50;
-    reg [31:0] target2 = 45;
+    reg [31:0] target = 60;
+    reg [31:0] target2 = 55;
     reg [3:0] turnNUM = 0;
     reg lengthstart = 0;
     reg incrementONCE = 1;
-    reg increment2ONCE = 1;
+    reg increment2ONCE = 0;
+    reg [3:0] AidanVars = 0;
+    reg rightShoveStart = 0;
+    reg rightShoveDone = 0;
+    reg leftShoveStart = 0;
+    reg leftShoveDone = 0;
+    reg [31:0] shoveCount = 0;
     
     reg [31:0] trueDistance1 = 0;
     reg [31:0] trueDistance2 = 0;
     reg debug = 0;
-    reg [3:0] state = 1;
+    reg [3:0] state = 0;
     reg aligned = 1;
     reg startalign = 1;
     reg [31:0] shortestDistance = 1000000000;
@@ -106,6 +115,11 @@ module Search_Algorithm(
     assign LED3 = trueled3;
     assign LED4 = trueled4;
     assign LED5 = trueled5;
+    
+    assign LED7 = RED;
+    assign LED8 = GREEN;
+    assign LED9 = BLUE;
+    
     assign LED12 = trueled12;
     
 UltraSonic_DistanceSensor FindDistance1(
@@ -186,7 +200,15 @@ Encoder_Reader Right_Side(
     .reset(reset2)
     );
     
-    
+    ColorSensor sensecolor(
+    .clock(clock),
+    .colorinput(colorinput),
+    .s2(colors2),
+    .s3(colors3),
+    .RED(RED),
+    .GREEN(GREEN),
+    .BLUE(BLUE)
+    );
 
 
 always @ (posedge clock) begin
@@ -253,7 +275,14 @@ always @ (posedge clock) begin
         trueDistance1 <= Distance1;
     end
     if(distance2Done) begin
+        if(AidanVars == 1) begin
+        Distance2Pre <= trueDistance2;
+        AidanVars <= 0;
         trueDistance2 <= Distance2;
+        end
+        else
+            AidanVars <= AidanVars + 1;
+        
     end
     
     
@@ -295,7 +324,54 @@ always @ (posedge clock) begin
 //               else begin
 //                counter2 <= 0;
 //               end
-               
+
+if(rightShoveStart) begin
+    width1 <= 450000;
+    width2 <= 1666666;
+    enA <= temp_PWM;
+    enB <= temp_PWM2;
+    
+    if(shoveCount > 40000000) begin
+        in1 <= 0;
+        in2 <= 0;
+        in3 <= 0;
+        in4 <= 0;
+        rightShoveStart <= 0;
+        rightShoveDone <= 1;
+        shoveCount <= 0;
+    end
+    else begin
+        in1 <= 0;
+        in2 <= 1;
+        in3 <= 1;
+        in4 <= 0;
+        shoveCount <= shoveCount + 1;
+    end
+end 
+
+if(leftShoveStart) begin
+    width1 <= 1666666;
+    width2 <= 450000;
+    enA <= temp_PWM;
+    enB <= temp_PWM2;
+    
+    if(shoveCount > 40000000) begin
+        in1 <= 0;
+        in2 <= 0;
+        in3 <= 0;
+        in4 <= 0;
+        rightShoveStart <= 0;
+        leftShoveDone <= 1;
+        shoveCount <= 0;
+    end
+    else begin
+        in1 <= 0;
+        in2 <= 1;
+        in3 <= 1;
+        in4 <= 0;
+        shoveCount <= shoveCount + 1;
+    end
+end                 
                
 if(turn) begin
     width1 <= 650000;
@@ -303,8 +379,32 @@ if(turn) begin
     enA <= temp_PWM;
     enB <= temp_PWM2;
     
+    if(turncounter > 145000000) begin
+    turncounter <= 0;
+    turndone <= 1; 
+    in1 <= 0;
+    in2 <= 0;
+    in3 <= 0;
+    in4 <= 0;
+    turn <= 0;
+    end
+    else begin
+    turncounter <= turncounter + 1;
+    in1 <= 1;
+    in2 <= 0;
+    in3 <= 1;
+    in4 <= 0;
+    end
     
-    if (resetCount > 1000) begin
+    /*if(turndone) begin
+    in1 <= 0;
+    in2 <= 0;
+    in3 <= 0;
+    in4 <= 0;
+    turn <= 0;
+    end*/
+end
+    /*if (resetCount > 1000) begin
         reset1 <= 0;
         reset2 <= 0;
         if(tic_count_L < 450 & tic_count_R > -450) begin
@@ -331,12 +431,16 @@ if(turn) begin
         in2 <= 0;
         in3 <= 0;
         in4 <= 0;
-    end
-end
+    end*/
     
     /*if(turncounter > 175000000) begin
     turncounter <= 0;
     turndone <= 1; 
+    in1 <= 0;
+    in2 <= 0;
+    in3 <= 0;
+    in4 <= 0;
+    turn <= 0;
     end
     else begin
     turncounter <= turncounter + 1;
@@ -358,14 +462,9 @@ end
     case(state)
     IDLE:
     begin
-        in1 <= 0;
-        in2 <= 1;
-        in3 <= 1;
-        in4 <= 0;
-        width1 <= 1666666;
-        width2 <= 1666666;
-        enA <= temp_PWM;
-        enB <= temp_PWM2;
+        
+        
+        
     end
     ALIGN:
     begin    
@@ -484,11 +583,11 @@ end
         enB <= temp_PWM2;
       
         if(trueDistance1 > (target+125)) begin
-            if(trueDistance2 < 87) begin
+            if(trueDistance2 < 88) begin
             width1 <= 400000;
             width2 <= 700000;
             end
-            else if(trueDistance2 > 93) begin
+            else if(trueDistance2 > 92) begin
             width1 <= 700000;
             width2 <= 400000;
             end
@@ -496,18 +595,6 @@ end
             width1 <= 700000;
             width2 <= 700000;
             end
-//            if(Distance2 > 100) begin
-//              width1 <= 700000;
-//              width2 <= 866666;
-//            end
-//            else if(Distance2 < 90) begin
-//              width1 <= 866666;
-//              width2 <= 700000;
-//            end
-//            else begin
-//              width1 <= 866666;
-//              width2 <= 866666;
-//            end
         end
         else if ((trueDistance1 < (target+75)) & (trueDistance1 > (target-75))) begin
             width1 <= 300000;
@@ -597,29 +684,62 @@ end
         end
         
         if(lengthstart) begin
-        
-             if(trueDistance1 > (target+125)) begin
-                if(trueDistance2 < (target2-4)) begin
-                    width1 <= 500000;
-                    width2 <= 800000;
+
+            if(trueDistance1 > (target+50)) begin
+                enA <= temp_PWM;
+                enB <= temp_PWM2;
+                if (trueDistance2 < (target2+6) & trueDistance2 > (target2-6))begin
+                rightShoveDone <= 0;
+                leftShoveDone <= 0;
+                in1 <= 0;
+                in2 <= 1;
+                in3 <= 1;
+                in4 <= 0; 
+                    if(trueDistance2 < (Distance2Pre-2)) begin
+                       width1 <= 300000;
+                       width2 <= (Distance2Pre - trueDistance2)* 300000;
+                    end
+                    else if (trueDistance2 > (Distance2Pre+2)) begin
+                        width1 <= (trueDistance2 - Distance2Pre)* 300000;
+                        width2 <= 300000;
+                    end 
+                    else begin
+                        width1 <= 700000;
+                        width2 <= 700000; 
+                    end
+                end  
+                else if(trueDistance2 > (target2+6)) begin
+                    if(rightShoveDone) begin
+                        in1 <= 0;
+                        in2 <= 1;
+                        in3 <= 1;
+                        in4 <= 0;
+                        width1 <= 700000;
+                        width2 <= 300000;
+                    end
+                    else begin
+                        rightShoveStart <= 1;
+                    end    
                 end
-                /*else if(trueDistance2 > (target2-4) & trueDistance2 < (target2)) begin
-                
-                end*/
-                else if(trueDistance2 > (target2+4)) begin
-                    width1 <= 700000;
-                    width2 <= 500000;
-                end
-                else begin
-                    width1 <= 700000;
-                    width2 <= 700000;
+                else if(trueDistance2 < (target2 - 6)) begin
+                    if(leftShoveDone) begin
+                        in1 <= 0;
+                        in2 <= 1;
+                        in3 <= 1;
+                        in4 <= 0;
+                        width1 <= 300000;
+                        width2 <= 700000;
+                    end
+                    else begin
+                        leftShoveStart <= 1;
+                    end
                 end
             end
-            else if ((trueDistance1 < (target+75)) & (trueDistance1 > (target-75))) begin
+            else if (trueDistance1 < (target+50)) begin
                 width1 <= 300000;
                 width2 <= 300000;
             end
-            else if ((trueDistance1 < (target+125))) begin
+            /*else if ((trueDistance1 < (target+125))) begin
                 if(trueDistance2 < (target2-3)) begin
                     width1 <= 350000;
                     width2 <= 600000;
@@ -632,7 +752,7 @@ end
                     width1 <= 500000;
                     width2 <= 500000;
                 end
-            end
+            end*/
             
             /*if(trueDistance1 < (target-10)) begin
                counter3 <= 0;

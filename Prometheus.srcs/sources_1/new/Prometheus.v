@@ -49,6 +49,7 @@ module Prometheus(
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     //LED12,LED13,LED14,LED15,
     input colorinput,
+    output colors2, colors3,
 
     output [3:0] an,
     //output testfrq,
@@ -114,13 +115,19 @@ Search_Algorithm Brain(
 .LED3(LED3),
 .LED4(LED4),
 .LED5(LED5),
+.LED7(LED7),
+.LED8(LED8),
+.LED9(LED9),
 .LED12(LED12),
 .Encoder1A(Encoder1A),
 .Encoder1B(Encoder1B),
 .Encoder2A(Encoder2A),
 .Encoder2B(Encoder2B),
 .IRSense1(IRSense1),
-.IRSense2(IRSense2)
+.IRSense2(IRSense2),
+.colorinput(colorinput),
+.colors2(colors2),
+.colors3(colors3)
 );
 
 /*assign L0  = L0 ;
