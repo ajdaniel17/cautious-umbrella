@@ -45,7 +45,7 @@ module Prometheus(
     input testport,
     output JC1,JC2,JC3,JC4,JC5,JC6,
     output s0,s1,s2,s3,s4,s5,s6,dp,
-    output LED0,LED1,LED2,LED3,LED4,LED5,LED12,LED14,LED15,
+    output LED0,LED1,LED2,LED3,LED4,LED5,LED7,LED8,LED9,LED12,LED14,LED15,
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     //LED12,LED13,LED14,LED15,
     input colorinput,
@@ -74,8 +74,7 @@ module Prometheus(
     reg clk2 = 0;
     reg [3:0] clockCounter = 0;
     wire signed[31:0] bridge1,bridge2,bridge3;
-    
-    
+        
     always @ (posedge clock) begin
     
      if (clockCounter > 9) begin

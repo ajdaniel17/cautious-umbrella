@@ -54,10 +54,10 @@ module ReadFrequency(
 
      always @ (posedge CLK)
           if(~enable) begin
-               freq = 0;
-               edge_count = 0;
-               count = 0;
-               done = 0;
+               freq <= 0;
+               edge_count <= 0;
+               count <= 0;
+               done <= 0;
           end
           else begin
                if (count < max)
@@ -71,16 +71,16 @@ module ReadFrequency(
                end
                else begin
                     // Reset the frequency variable
-                    freq = 0;
+                    freq <= 0;
                     // Multiply the value counted so far by 16 because it's only
                     // been 1/16th of a second so far
-                    freq = edge_count * 16;
+                    freq <= edge_count * 16;
                     // Reset the edge count
-                    edge_count = 0;
+                    edge_count <= 0;
                     // Reset the 1/16th second counter
-                    count = 0;
+                    count <= 0;
                     // We're done, so set the flag on
-                    done = 1;
+                    done <= 1;
                end
                end
 endmodule

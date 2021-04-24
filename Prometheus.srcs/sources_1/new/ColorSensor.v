@@ -48,7 +48,7 @@ module ColorSensor(
     reg[16:0] frqToDivCount;
     reg doneWithDiv=0,enableStore2=0,doneWithReadFrq=0,turnOnDiv=0;
     reg [6:0] redThresh = 7'd50;
-    reg [6:0] blueThresh = 7'd40;
+    reg [6:0] blueThresh = 7'd45;
     reg [6:0] greenThresh = 7'd35;
     
 ReadFrequency Readthis(
@@ -78,15 +78,15 @@ IntegerDivision DivideByClear(
     begin
         if(colorsetting == 2'd0)
         begin
-            TEMPFRQ = FRQ;
-            FRQenable = 0;
-            doneWithDiv =1;    
+            TEMPFRQ <= FRQ;
+            FRQenable <= 0;
+            doneWithDiv <= 1;    
         end
         else
         begin
-            TEMPFRQ2 = FRQ;
-            FRQenable = 0;
-            doneWithReadFrq = 1;
+            TEMPFRQ2 <= FRQ;
+            FRQenable <= 0;
+            doneWithReadFrq <= 1;
         end
     end
     
@@ -94,9 +94,9 @@ IntegerDivision DivideByClear(
     //Divider has finished dividing
     if(divdone)
     begin 
-        TEMPFRQ = tempquo;
-        DIVenable = 0;
-        doneWithDiv = 1;
+        TEMPFRQ <= tempquo;
+        DIVenable <= 0;
+        doneWithDiv <= 1;
     end
             
      
@@ -104,9 +104,9 @@ IntegerDivision DivideByClear(
     //Frequency counter buffer
     if (frqToDivCount > 2)
     begin
-        turnOnDiv = 1;
+        turnOnDiv <= 1;
         frqToDivCount <= 0;
-        doneWithReadFrq = 0;
+        doneWithReadFrq <= 0;
     end
     else if (doneWithReadFrq)
         frqToDivCount <= frqToDivCount +1;
@@ -115,9 +115,9 @@ IntegerDivision DivideByClear(
     //Divider Buffer
     if (divToStoreCount > 5)
     begin
-        enableStore2 = 1;
+        enableStore2 <= 1;
         divToStoreCount <= 0;
-        doneWithDiv = 0;
+        doneWithDiv <= 0;
     end
     else if (doneWithDiv)
         divToStoreCount <= divToStoreCount +1;
@@ -130,74 +130,74 @@ IntegerDivision DivideByClear(
         case(colorsetting)
             2'd0 : 
             begin //white to red
-                TEMPWHITE = TEMPFRQ;
-                temps2 = 0;
-                temps3 = 0;
-                colorsetting = 2'd1;
-                FRQenable = 1;
+                TEMPWHITE <= TEMPFRQ;
+                temps2 <= 0;
+                temps3 <= 0;
+                colorsetting <= 2'd1;
+                FRQenable <= 1;
             end
             2'd1 : 
             begin //red to green
-                TEMPRED = TEMPFRQ;
-                temps2 = 1;
-                temps3 = 1;
-                colorsetting = 2'd2;
-                FRQenable = 1;
+                TEMPRED <= TEMPFRQ;
+                temps2 <= 1;
+                temps3 <= 1;
+                colorsetting <= 2'd2;
+                FRQenable <= 1;
             end
             2'd2 : 
             begin //green to blue
-                TEMPGREEN = TEMPFRQ;
-                temps2 = 0;
-                temps3 = 1;
-                colorsetting = 2'd3;
-                FRQenable = 1;
+                TEMPGREEN <= TEMPFRQ;
+                temps2 <= 0;
+                temps3 <= 1;
+                colorsetting <= 2'd3;
+                FRQenable <= 1;
             end
             2'd3 : 
             begin //blue to white
-                TEMPBLUE = TEMPFRQ;
-                temps2 = 1;
-                temps3 = 0;
-                colorsetting = 2'd0;
-                enableStore1 = 0;
+                TEMPBLUE <= TEMPFRQ;
+                temps2 <= 1;
+                temps3 <= 0;
+                colorsetting <= 2'd0;
+                enableStore1 <= 0;
             end
             
         endcase
-        enableStore2 = 0;
+        enableStore2 <= 0;
     end    
     
     if(turnOnDiv)
     begin
-        DIVenable = 1;
-        turnOnDiv = 0;
+        DIVenable <= 1;
+        turnOnDiv <= 0;
     end
         
     if(~enableStore1)
     begin
-        FRQenable = 0;
+        FRQenable <= 0;
     
         if(TEMPRED > redThresh)
-            TLED0  = 1;
+            TLED0 <= 1;
 
         else
-            TLED0  = 0;
+            TLED0 <= 0;
             
         if (TEMPGREEN > greenThresh)
 
-            TLED1 = 1;
+            TLED1 <= 1;
 
         else
-            TLED1 = 0;
+            TLED1 <= 0;
             
         if (TEMPBLUE > blueThresh)
  
-            TLED2 = 1;
+            TLED2 <= 1;
 
       
         else
-            TLED2 = 0;
+            TLED2 <= 0;
   
-        enableStore1 = 1;
-        FRQenable = 1;
+        enableStore1 <= 1;
+        FRQenable <= 1;
     end
     
 end

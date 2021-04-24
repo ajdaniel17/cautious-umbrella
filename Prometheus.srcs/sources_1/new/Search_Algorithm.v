@@ -81,11 +81,18 @@ module Search_Algorithm(
     reg leftShoveStart = 0;
     reg leftShoveDone = 0;
     reg [31:0] shoveCount = 0;
+    reg [31:0] REDcount = 0;
+    reg [31:0] GREENcount = 0;
+    reg [31:0] BLUEcount = 0;
+    reg redLED = 0;
+    reg greenLED = 0;
+    reg blueLED = 0;
+    reg [31:0] colorRESET = 0;
     
     reg [31:0] trueDistance1 = 0;
     reg [31:0] trueDistance2 = 0;
     reg debug = 0;
-    reg [3:0] state = 0;
+    reg [3:0] state = 1;
     reg aligned = 1;
     reg startalign = 1;
     reg [31:0] shortestDistance = 1000000000;
@@ -116,9 +123,12 @@ module Search_Algorithm(
     assign LED4 = trueled4;
     assign LED5 = trueled5;
     
-    assign LED7 = RED;
+    assign LED7 = redLED;
+    assign LED8 = greenLED;
+    assign LED9 = blueLED;
+    /*assign LED7 = RED;
     assign LED8 = GREEN;
-    assign LED9 = BLUE;
+    assign LED9 = BLUE;*/
     
     assign LED12 = trueled12;
     
@@ -395,7 +405,50 @@ if(turn) begin
     in3 <= 1;
     in4 <= 0;
     end
-    
+end
+    if(state == SEARCH) begin
+        if(RED) begin
+            REDcount = REDcount + 1;
+        end
+        if(GREEN) begin
+            GREENcount <= GREENcount + 1;
+        end
+        if(BLUE) begin
+            BLUEcount <= BLUEcount + 1;
+        end
+        
+        if(colorRESET > 10000001) begin
+            colorRESET <= 0;
+            REDcount <= 0;
+            GREENcount <= 0;
+            BLUEcount <= 0;
+        end    
+        else begin
+            colorRESET <= colorRESET + 1;
+        end
+        
+        if(REDcount > 7000000 & colorRESET > 10000000) begin
+            redLED <= 1;
+        end
+        else if(REDcount < 7000000 & colorRESET > 10000000) begin
+            redLED <= 0;
+        end
+        
+        if(GREENcount > 7000000 & colorRESET > 10000000) begin
+            greenLED <= 1;
+        end
+        else if(GREENcount < 7000000 & colorRESET > 10000000) begin
+            greenLED <= 0;
+        end
+        
+        if(BLUEcount > 7000000 & colorRESET > 10000000) begin
+            blueLED <= 1;
+        end
+        else if(BLUEcount < 7000000 & colorRESET > 10000000) begin
+            blueLED <= 0;
+        end  
+    end
+
     /*if(turndone) begin
     in1 <= 0;
     in2 <= 0;
@@ -403,7 +456,6 @@ if(turn) begin
     in4 <= 0;
     turn <= 0;
     end*/
-end
     /*if (resetCount > 1000) begin
         reset1 <= 0;
         reset2 <= 0;
@@ -463,6 +515,66 @@ end
     IDLE:
     begin
         
+        /*if(RED) begin
+            if(REDcount > 1666666) begin
+                redLED <= 1;
+                REDcount <= 0;
+                
+            end
+            else begin
+                REDcount <= REDcount + 1;
+            end
+        end
+        else begin
+            REDcount <= 0;
+        end
+        if(GREEN) begin
+            GREENcount <= GREENcount + 1;
+        end
+        if(BLUE) begin
+            BLUEcount <= BLUEcount + 1;
+        end*/
+        
+        if(RED) begin
+            REDcount = REDcount + 1;
+        end
+        if(GREEN) begin
+            GREENcount <= GREENcount + 1;
+        end
+        if(BLUE) begin
+            BLUEcount <= BLUEcount + 1;
+        end
+        
+        if(colorRESET > 10000001) begin
+            colorRESET <= 0;
+            REDcount <= 0;
+            GREENcount <= 0;
+            BLUEcount <= 0;
+        end    
+        else begin
+            colorRESET <= colorRESET + 1;
+        end
+        
+        if(REDcount > 7000000 & colorRESET > 10000000) begin
+            redLED <= 1;
+        end
+        else if(REDcount < 7000000 & colorRESET > 10000000) begin
+            redLED <= 0;
+        end
+        
+        if(GREENcount > 7000000 & colorRESET > 10000000) begin
+            greenLED <= 1;
+        end
+        else if(GREENcount < 7000000 & colorRESET > 10000000) begin
+            greenLED <= 0;
+        end
+        
+        if(BLUEcount > 7000000 & colorRESET > 10000000) begin
+            blueLED <= 1;
+        end
+        else if(BLUEcount < 7000000 & colorRESET > 10000000) begin
+            blueLED <= 0;
+        end
         
         
     end
