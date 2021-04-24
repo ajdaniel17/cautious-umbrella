@@ -50,6 +50,8 @@ module Prometheus(
     //LED12,LED13,LED14,LED15,
     input colorinput,
     output colors2, colors3,
+    input colorinput2,
+    output color2s2, color2s3,
 
     output [3:0] an,
     //output testfrq,
@@ -126,7 +128,10 @@ Search_Algorithm Brain(
 .IRSense2(IRSense2),
 .colorinput(colorinput),
 .colors2(colors2),
-.colors3(colors3)
+.colors3(colors3),
+.colorinput2(colorinput2),
+.color2s2(color2s2),
+.color2s3(color2s3)
 );
 
 /*assign L0  = L0 ;

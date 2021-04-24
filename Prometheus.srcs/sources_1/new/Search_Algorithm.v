@@ -38,7 +38,9 @@ module Search_Algorithm(
     input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     input IRSense1, IRSense2,
     input colorinput,
-    output colors2, colors3
+    output colors2, colors3,
+    input colorinput2,
+    output color2s2, color2s3
     );
     localparam IDLE = 0,
                ALIGN = 1,
@@ -52,6 +54,7 @@ module Search_Algorithm(
     wire distanceDone,distance2Done;
     wire signed [31:0] tic_count_L,tic_count_R;
     wire RED, GREEN, BLUE;
+    wire RED2, GREEN2, BLUE2;
     
     reg reset1 = 0, reset2 = 0;
     reg [31:0] resetCount = 0;
@@ -84,6 +87,9 @@ module Search_Algorithm(
     reg [31:0] REDcount = 0;
     reg [31:0] GREENcount = 0;
     reg [31:0] BLUEcount = 0;
+    reg [31:0] RED2count = 0;
+    reg [31:0] GREEN2count = 0;
+    reg [31:0] BLUE2count = 0;
     reg redLED = 0;
     reg greenLED = 0;
     reg blueLED = 0;
@@ -111,6 +117,10 @@ module Search_Algorithm(
     reg turndone = 0;
     reg turnBuffer = 0;
     reg [31:0] turnCounter = 0;
+    reg colorflag = 0;
+    reg [31:0]colorstop = 0;
+    reg colorbuffer = 0;
+    reg [31:0] colorbuffercounter = 0;
     
     reg trueled0,trueled1,trueled2,trueled3,trueled4,trueled5,trueled12;
     
@@ -210,7 +220,7 @@ Encoder_Reader Right_Side(
     .reset(reset2)
     );
     
-    ColorSensor sensecolor(
+ColorSensor sensecolor(
     .clock(clock),
     .colorinput(colorinput),
     .s2(colors2),
@@ -218,6 +228,15 @@ Encoder_Reader Right_Side(
     .RED(RED),
     .GREEN(GREEN),
     .BLUE(BLUE)
+    );
+ColorSensor sensecolor2(
+    .clock(clock),
+    .colorinput(color2input2),
+    .s2(color2s2),
+    .s3(color2s3),
+    .RED(RED2),
+    .GREEN(GREEN2),
+    .BLUE(BLUE2)
     );
 
 
@@ -281,6 +300,43 @@ end*/
 
 always @ (posedge clock) begin
     
+    if(colorstop > 250000000) begin
+        colorstop <= 0;
+        //colorflag <= 0;
+        colorbuffer <= 1;
+    end
+    else if(colorflag) begin
+        colorstop <= colorstop + 1;
+        colorRESET <= 0;
+        REDcount <= 0;
+        GREENcount <= 0;
+        BLUEcount <= 0;
+        RED2count <= 0;
+        GREEN2count <= 0;
+        BLUE2count <= 0;
+        enA <= 0;
+        enB <= 0;
+        in1 <= 0;
+        in2 <= 0;
+        in3 <= 0;
+        in4 <= 0;
+    end
+    
+    if(colorbuffercounter > 200000000) begin
+        colorbuffercounter <= 0;
+        colorbuffer <= 0;
+    end
+    else if(colorbuffer) begin
+        colorbuffercounter <= colorbuffercounter + 1;
+        redLED <= 0;
+        greenLED <= 0;
+        blueLED <= 0;
+    end
+    
+    if(colorbuffercounter == 1) begin
+        colorflag <= 0;
+    end
+    
     if(distanceDone) begin
         trueDistance1 <= Distance1;
     end
@@ -335,7 +391,7 @@ always @ (posedge clock) begin
 //                counter2 <= 0;
 //               end
 
-if(rightShoveStart) begin
+if(rightShoveStart & ~colorflag) begin
     width1 <= 450000;
     width2 <= 1666666;
     enA <= temp_PWM;
@@ -359,7 +415,7 @@ if(rightShoveStart) begin
     end
 end 
 
-if(leftShoveStart) begin
+if(leftShoveStart & ~colorflag) begin
     width1 <= 1666666;
     width2 <= 450000;
     enA <= temp_PWM;
@@ -383,7 +439,7 @@ if(leftShoveStart) begin
     end
 end                 
                
-if(turn) begin
+if(turn & ~colorflag) begin
     width1 <= 650000;
     width2 <= 650000;
     enA <= temp_PWM;
@@ -406,7 +462,7 @@ if(turn) begin
     in4 <= 0;
     end
 end
-    if(state == SEARCH) begin
+    if((state == SEARCH) & (~colorflag) & (~colorbuffer)) begin
         if(RED) begin
             REDcount = REDcount + 1;
         end
@@ -417,11 +473,24 @@ end
             BLUEcount <= BLUEcount + 1;
         end
         
+        if(RED2) begin
+            RED2count = RED2count + 1;
+        end
+        if(GREEN2) begin
+            GREEN2count <= GREEN2count + 1;
+        end
+        if(BLUE2) begin
+            BLUE2count <= BLUE2count + 1;
+        end
+        
         if(colorRESET > 10000001) begin
             colorRESET <= 0;
             REDcount <= 0;
             GREENcount <= 0;
             BLUEcount <= 0;
+            RED2count <= 0;
+            GREEN2count <= 0;
+            BLUE2count <= 0;
         end    
         else begin
             colorRESET <= colorRESET + 1;
@@ -429,6 +498,7 @@ end
         
         if(REDcount > 7000000 & colorRESET > 10000000) begin
             redLED <= 1;
+            colorflag <= 1;
         end
         else if(REDcount < 7000000 & colorRESET > 10000000) begin
             redLED <= 0;
@@ -436,6 +506,7 @@ end
         
         if(GREENcount > 7000000 & colorRESET > 10000000) begin
             greenLED <= 1;
+            colorflag <= 1;
         end
         else if(GREENcount < 7000000 & colorRESET > 10000000) begin
             greenLED <= 0;
@@ -443,10 +514,36 @@ end
         
         if(BLUEcount > 7000000 & colorRESET > 10000000) begin
             blueLED <= 1;
+            colorflag <= 1;
         end
         else if(BLUEcount < 7000000 & colorRESET > 10000000) begin
             blueLED <= 0;
+        end
+        
+        if(RED2count > 7000000 & colorRESET > 10000000) begin
+            redLED <= 1;
+            colorflag <= 1;
+        end
+        else if(RED2count < 7000000 & colorRESET > 10000000) begin
+            redLED <= 0;
+        end
+        
+        if(GREEN2count > 7000000 & colorRESET > 10000000) begin
+            greenLED <= 1;
+            colorflag <= 1;
+        end
+        else if(GREEN2count < 7000000 & colorRESET > 10000000) begin
+            greenLED <= 0;
+        end
+        
+        if(BLUE2count > 7000000 & colorRESET > 10000000) begin
+            blueLED <= 1;
+            colorflag <= 1;
+        end
+        else if(BLUE2count < 7000000 & colorRESET > 10000000) begin
+            blueLED <= 0;
         end  
+          
     end
 
     /*if(turndone) begin
@@ -770,7 +867,7 @@ end
         end
         
         
-    if(turnBuffer) begin
+    if(turnBuffer & ~colorflag) begin
     
         if(turndone) begin
             turndone <= 0;
@@ -795,11 +892,9 @@ end
             
         end
         
-        if(lengthstart) begin
-
+        if(lengthstart & ~colorflag) begin
+            
             if(trueDistance1 > (target+50)) begin
-                enA <= temp_PWM;
-                enB <= temp_PWM2;
                 if (trueDistance2 < (target2+6) & trueDistance2 > (target2-6))begin
                 rightShoveDone <= 0;
                 leftShoveDone <= 0;
