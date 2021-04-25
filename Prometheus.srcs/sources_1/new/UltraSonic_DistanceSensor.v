@@ -30,7 +30,7 @@ module UltraSonic_DistanceSensor(
     //wire [31:0] tempdistance,
     //wire divdone,
     //output reg lastecho,
-    output reg [4:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
+    output reg [5:0] D1 = 0,D2 = 0,D3 = 0,D4 =0,
     //wire divdone1,divdone2,divdone3,divdone4,   
     //wire [31:0] tempD1,tempD2,tempD3,tempD4,
     output reg done=0

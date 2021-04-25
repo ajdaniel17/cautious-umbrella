@@ -22,7 +22,7 @@
 
 module SevenSegmentDisplay(
  input clock, reset,
- input [4:0] input0, input1, input2, input3,  //the 4 inputs for each display
+ input [5:0] input0, input1, input2, input3,  //the 4 inputs for each display
  output s0, s1, s2, s3, s4, s5, s6, dp, //the individual LED output for the seven segment along with the digital point
  output [3:0] an   // the 4 bit enable signal
  );
@@ -84,23 +84,31 @@ reg [6:0] sseg_temp; // 7 bit register to hold the binary value of each input gi
 always @ (*)
  begin
   case(sseg)
-   4'd0 : sseg_temp <= 7'b1000000; //to display 0
-   4'd1 : sseg_temp <= 7'b1111001; //to display 1
-   4'd2 : sseg_temp <= 7'b0100100; //to display 2
-   4'd3 : sseg_temp <= 7'b0110000; //to display 3
-   4'd4 : sseg_temp <= 7'b0011001; //to display 4
-   4'd5 : sseg_temp <= 7'b0010010; //to display 5
-   4'd6 : sseg_temp <= 7'b0000010; //to display 6
-   4'd7 : sseg_temp <= 7'b1111000; //to display 7
-   4'd8 : sseg_temp <= 7'b0000000; //to display 8
-   4'd9 : sseg_temp <= 7'b0010000; //to display 9
-   4'd10 : sseg_temp <= 7'b0001000; //to display A
-   4'd11 : sseg_temp <= 7'b0000011; //to display b
-   4'd12 : sseg_temp <= 7'b1000110; //to display C
-   4'd13 : sseg_temp <= 7'b0100001; //to display d
-   4'd14 : sseg_temp <= 7'b0000110; //to display E
-   4'd15 : sseg_temp <= 7'b0001110; //to display F
-   
+   5'd0 : sseg_temp <= 7'b1000000; //to display 0
+   5'd1 : sseg_temp <= 7'b1111001; //to display 1
+   5'd2 : sseg_temp <= 7'b0100100; //to display 2
+   5'd3 : sseg_temp <= 7'b0110000; //to display 3
+   5'd4 : sseg_temp <= 7'b0011001; //to display 4
+   5'd5 : sseg_temp <= 7'b0010010; //to display 5
+   5'd6 : sseg_temp <= 7'b0000010; //to display 6
+   5'd7 : sseg_temp <= 7'b1111000; //to display 7
+   5'd8 : sseg_temp <= 7'b0000000; //to display 8
+   5'd9 : sseg_temp <= 7'b0010000; //to display 9
+   5'd10 : sseg_temp <= 7'b0001000; //to display A
+   5'd11 : sseg_temp <= 7'b0000011; //to display b
+   5'd12 : sseg_temp <= 7'b1000110; //to display C
+   5'd13 : sseg_temp <= 7'b0100001; //to display d
+   5'd14 : sseg_temp <= 7'b0000110; //to display E
+   5'd15 : sseg_temp <= 7'b0001110; //to display F
+   5'd16 : sseg_temp <= 7'b0101111; //to display r
+   5'd17 : sseg_temp <= 7'b0000110; //to display E
+   5'd18 : sseg_temp <= 7'b0100001; //to display d
+   5'd19 : sseg_temp <= 7'b1000010; //to display G
+   5'd20 : sseg_temp <= 7'b0101011; //to display n
+   5'd21 : sseg_temp <= 7'b0000011; //to display b
+   5'd22 : sseg_temp <= 7'b1001111; //to display l
+   5'd23 : sseg_temp <= 7'b1000001; //to display U
+   5'd24 : sseg_temp <= 7'b1111111; //to display nothing
    default : sseg_temp <= 7'b0111111; //dash
   endcase
  end

@@ -32,15 +32,15 @@ module Search_Algorithm(
     //wire led0,led1,led2,led3,led4,led5,led12,
     output LED0, LED1, LED2, LED3, LED4, LED5, LED7, LED8, LED9, LED12,
     //wire [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,D1s3,D2s3,D3s3,D4s3,
-    output reg [4:0] D1o,D2o,D3o,D4o,
+    output reg [5:0] D1o,D2o,D3o,D4o,
     //wire distanceDone,distance2Done,
     //wire signed [31:0] tic_count_L,tic_count_R,
-    input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
+    //input Encoder1A,Encoder1B,Encoder2A,Encoder2B,
     input IRSense1, IRSense2,
     input colorinput,
-    output colors2, colors3,
-    input colorinput2,
-    output color2s2, color2s3
+    output colors2, colors3
+    //input colorinput2,
+    //output color2s2, color2s3
     );
     localparam IDLE = 0,
                ALIGN = 1,
@@ -50,9 +50,9 @@ module Search_Algorithm(
     wire [31:0] Distance2;
     wire led0,led1,led2,led3,led4,led5,led12;
     wire led0_2,led1_2,led2_2,led3_2,led4_2,led5_2,led12_2;
-    wire [4:0] D1s0,D2s0,D3s0,D4s0,D1s1,D2s1,D3s1,D4s1,D1s2,D2s2,D3s2,D4s2,D1s3,D2s3,D3s3,D4s3;
+    wire [5:0] D1s0,D2s0,D3s0,D4s0,D1s3,D2s3,D3s3,D4s3;
     wire distanceDone,distance2Done;
-    wire signed [31:0] tic_count_L,tic_count_R;
+    //wire signed [31:0] tic_count_L,tic_count_R;
     wire RED, GREEN, BLUE;
     wire RED2, GREEN2, BLUE2;
     
@@ -98,7 +98,7 @@ module Search_Algorithm(
     reg [31:0] trueDistance1 = 0;
     reg [31:0] trueDistance2 = 0;
     reg debug = 0;
-    reg [3:0] state = 1;
+    reg [3:0] state = 0;
     reg aligned = 1;
     reg startalign = 1;
     reg [31:0] shortestDistance = 1000000000;
@@ -133,12 +133,12 @@ module Search_Algorithm(
     assign LED4 = trueled4;
     assign LED5 = trueled5;
     
-    assign LED7 = redLED;
+    /*assign LED7 = redLED;
     assign LED8 = greenLED;
-    assign LED9 = blueLED;
-    /*assign LED7 = RED;
+    assign LED9 = blueLED;*/
+    assign LED7 = RED;
     assign LED8 = GREEN;
-    assign LED9 = BLUE;*/
+    assign LED9 = BLUE;
     
     assign LED12 = trueled12;
     
@@ -196,7 +196,7 @@ UltraSonic_DistanceSensor SecondFindDistance(
 .done(distance2Done)
 ); */
 
-Encoder_Reader Left_Side(
+/*Encoder_Reader Left_Side(
     .signalA(Encoder1A),
     .signalB(Encoder1B),
     .clock(clock),
@@ -218,7 +218,7 @@ Encoder_Reader Right_Side(
     .D3(D3s2),
     .D4(D4s2),
     .reset(reset2)
-    );
+    );*/
     
 ColorSensor sensecolor(
     .clock(clock),
@@ -229,6 +229,7 @@ ColorSensor sensecolor(
     .GREEN(GREEN),
     .BLUE(BLUE)
     );
+    /*
 ColorSensor sensecolor2(
     .clock(clock),
     .colorinput(color2input2),
@@ -238,7 +239,7 @@ ColorSensor sensecolor2(
     .GREEN(GREEN2),
     .BLUE(BLUE2)
     );
-
+*/
 
 always @ (posedge clock) begin
 if(S0) begin
@@ -254,18 +255,6 @@ D2o <= D2s0;
 D3o <= D3s0;
 D4o <= D4s0;
 end
-else if (S1) begin
-D1o <= D1s1;
-D2o <= D2s1;
-D3o <= D3s1;
-D4o <= D4s1;
-end 
-else if (S2) begin
-D1o <= D1s2;
-D2o <= D2s2;
-D3o <= D3s2;
-D4o <= D4s2;
-end
 else if(S3) begin
 trueled0 <= led0_2;
 trueled1 <= led1_2;
@@ -280,10 +269,30 @@ D3o <= D3s3;
 D4o <= D4s3;
 end
 else begin 
-D1o <= 0;
-D2o <= 0;
-D3o <= 0;
-D4o <= 0;
+if(redLED) begin
+D1o <= 5'd18;
+D2o <= 5'd17;
+D3o <= 5'd16;
+D4o <= 5'd24;
+end
+else if(blueLED) begin
+D1o <= 5'd17;
+D2o <= 5'd23;
+D3o <= 5'd22;
+D4o <= 5'd21;
+end
+else if(greenLED) begin
+D1o <= 5'd20;
+D2o <= 5'd16;
+D3o <= 5'd19;
+D4o <= 5'd24;
+end
+else begin
+    D1o <= 5'd24;
+    D2o <= 5'd24;
+    D3o <= 5'd24;
+    D4o <= 5'd24;
+end
 end
 
 end
@@ -300,7 +309,7 @@ end*/
 
 always @ (posedge clock) begin
     
-    if(colorstop > 250000000) begin
+    /*if(colorstop > 250000000) begin
         colorstop <= 0;
         //colorflag <= 0;
         colorbuffer <= 1;
@@ -335,7 +344,7 @@ always @ (posedge clock) begin
     
     if(colorbuffercounter == 1) begin
         colorflag <= 0;
-    end
+    end*/
     
     if(distanceDone) begin
         trueDistance1 <= Distance1;
@@ -348,7 +357,6 @@ always @ (posedge clock) begin
         end
         else
             AidanVars <= AidanVars + 1;
-        
     end
     
     
@@ -440,8 +448,8 @@ if(leftShoveStart & ~colorflag) begin
 end                 
                
 if(turn & ~colorflag) begin
-    width1 <= 650000;
-    width2 <= 650000;
+    width1 <= 800000;
+    width2 <= 800000;
     enA <= temp_PWM;
     enB <= temp_PWM2;
     
@@ -462,9 +470,10 @@ if(turn & ~colorflag) begin
     in4 <= 0;
     end
 end
+/*
     if((state == SEARCH) & (~colorflag) & (~colorbuffer)) begin
         if(RED) begin
-            REDcount = REDcount + 1;
+            REDcount <= REDcount + 1;
         end
         if(GREEN) begin
             GREENcount <= GREENcount + 1;
@@ -474,7 +483,7 @@ end
         end
         
         if(RED2) begin
-            RED2count = RED2count + 1;
+            RED2count <= RED2count + 1;
         end
         if(GREEN2) begin
             GREEN2count <= GREEN2count + 1;
@@ -545,7 +554,7 @@ end
         end  
           
     end
-
+*/
     /*if(turndone) begin
     in1 <= 0;
     in2 <= 0;
@@ -633,7 +642,23 @@ end
         end*/
         
         if(RED) begin
-            REDcount = REDcount + 1;
+            redLED <= 1;
+        end
+        else
+            redLED <= 0;
+        if(GREEN) begin
+            greenLED <= 1;
+        end
+        else
+            greenLED <= 0;
+        if(BLUE) begin
+            blueLED <= 1;
+        end
+        else
+            blueLED <= 0;
+        
+        /*if(RED) begin
+            REDcount <= REDcount + 1;
         end
         if(GREEN) begin
             GREENcount <= GREENcount + 1;
@@ -671,7 +696,7 @@ end
         end
         else if(BLUEcount < 7000000 & colorRESET > 10000000) begin
             blueLED <= 0;
-        end
+        end*/
         
         
     end
@@ -701,7 +726,7 @@ end
                 firstturn <= 1;
                 end
             end 
-            else if(IRSense1 == 0) begin
+            else if(IRSense1 == 1) begin
                 IRcount1 <= IRcount1 + 1;
                 /*in1 <= 0;
                 in2 <= 0;*/
@@ -722,7 +747,7 @@ end
                 firstturn <= 2;
                 end
             end 
-            else if(IRSense2 == 0) begin
+            else if(IRSense2 == 1) begin
                 IRcount2 <= IRcount2 + 1;
                 /*in3 <= 0;
                 in4 <= 0;*/
